@@ -1,24 +1,65 @@
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var container;
+var camera;
+var renderer;
+var scene;
 
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+function init() {
+    // Adding canvas div to body
+    container = document.createElement( 'div' );
+    document.body.appendChild( container );
 
-var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-var cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+    // Initializing the camera    
+    camera = new THREE.PerspectiveCamera( 45,
+                window.innerWidth / window.innerHeight,
+                1, 2000 );
+    camera.position.z = 100;
+    
+    // Initializing scene
+    scene = new THREE.Scene();
 
-camera.position.z = 5;
+    // Initializing lighting parameters
+    var ambient = new THREE.AmbientLight( 0xffffff );
+    scene.add( ambient );
 
-var render = function () {
-    requestAnimationFrame( render );
+    var directional = new THREE.DirectionalLight( 0xffffff );
+    directional.position.set( 0, 0, 1 );
+    scene.add( directional );
+    
+    // Object Loader
+    var loadingManager = new THREE.LoadingManager();
+    loadingManager.onProgress = function( item, loaded, total ) {
+        console.log( item, loaded, total );
+    }
+   
+    var loader = new THREE.OBJLoader( function() {} );
+    var objFileName = 'js/test.obj'
+    var objCallback = function( object ) {
+        object.position.y = -80;
+        scene.add( object );
+    };
 
-    cube.rotation.x += 0.1;
-    cube.rotation.y += 0.1;
+    var objProgress = function( xhr ) {
+        if( xhr.lengthComputable ) {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            console.log( Math.round(percentComplete, 2) + "% complete" );
+        }
+    }
+    loader.load( objFileName, 
+                 objCallback, 
+                 function( xhr ) {} );
 
-    renderer.render(scene, camera);
-};
+    // Initialing renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    container.appendChild( renderer.domElement );       
+}    
 
+
+
+function render() {
+    renderer.render( scene, camera );
+}
+
+init();
 render();
