@@ -1,4 +1,5 @@
 #include "obj_viewer.h"
+#include "obj_printer.h"
 #include "obj_data.h"
 
 #include <iostream>
@@ -20,6 +21,8 @@ main(
   } else {
     return 1;
   }
+
+  // ObjPrint::PrintFromData(data);
 
   ObjViewer::GetInstance().SetData(data);
 

@@ -1,9 +1,13 @@
 #include "obj_viewer.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <math.h>
 
 ObjViewer&
 ObjViewer::GetInstance()
@@ -58,6 +62,7 @@ ObjViewer::Run()
     /* register function to handle keyboard input */
     glfwSetKeyCallback(m_window, ObjViewer::GetInstance().s_HandleKeyboard);      // general keyboard input
     glfwSetCharCallback(m_window, ObjViewer::GetInstance().s_HandleCharacter);  // ser specific character handling
+    glfwSetScrollCallback(m_window, ObjViewer::GetInstance().s_HandleScroll);
 
     do {
         Render();
@@ -75,6 +80,12 @@ void
 ObjViewer::s_HandleCharacter(GLFWwindow* wd, unsigned int key)
 {
     GetInstance().HandleCharacter(wd, key);
+}
+
+void
+ObjViewer::s_HandleScroll(GLFWwindow* wd, double xoffset, double yoffset)
+{
+    GetInstance().HandleScroll(wd, xoffset, yoffset);
 }
 
 void
@@ -140,6 +151,23 @@ ObjViewer::HandleCharacter(GLFWwindow* wd, unsigned int key)
 }
 
 void
+ObjViewer::HandleScroll(GLFWwindow* wd, double xoffset, double yoffset)
+{
+    std::cout << yoffset << std::endl;
+
+    float offset = m_scale + (double)yoffset * 0.0f;
+    if (offset > 5.0f)
+    {
+        offset = 5.0f;
+    }
+    if (offset < 0.01f)
+    {
+        offset = 0.01f;
+    }
+    m_scale = offset;
+}
+
+void
 ObjViewer::HandleError(int errcode, const char* desc)
 {
     fprintf(stderr, "%d: %s\n", errcode, desc);
@@ -184,54 +212,64 @@ ObjViewer::HandleWindowReshape(GLFWwindow* wd, int w, int h)
 void
 ObjViewer::Render()
 {
-    /* no transformation */
+    float ratio = m_frameWidth / (float) m_frameHeight;
+
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    // glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
 
-    /* clear color buffer to white */
-    glClearColor(1.0, 1.0, 1.0, 0.0);
+    glScalef(m_scale, m_scale, m_scale);
 
-    glColor3f(0.0, 0.0, 0.0);
-    glLineWidth(1.0);
+    auto shapes = m_data->m_shapes;
 
-    /* color buffer must be cleared each time */
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    if (m_dataChanged == true)
+    for (unsigned int i = 0; i < shapes->size(); ++i)
     {
+        tinyobj::mesh_t mesh = (*shapes)[i].mesh;
+        for (size_t f = 0; f < mesh.indices.size() / 3; ++f) {
 
-        vector<glm::vec4> vertices;
-        std::shared_ptr<ObjData> data = m_data;
+            glBegin(GL_TRIANGLES);
 
-        auto shapes = data->m_shapes;
+            int v0 = mesh.indices[3*f+0];
+            int v1 = mesh.indices[3*f+1];
+            int v2 = mesh.indices[3*f+2];
 
-        glBegin(GL_POLYGON);
+            glColor3f(1.f, 0.f, 0.f);
+            glVertex3f(
+                mesh.positions[3*v0+0],
+                mesh.positions[3*v0+1],
+                mesh.positions[3*v0+2]
+            );
 
-        for (unsigned int i = 0; i < shapes->size(); ++i) {
+            glColor3f(0.f, 1.f, 0.f);
+            glVertex3f(
+                mesh.positions[3*v1+0],
+                mesh.positions[3*v1+1],
+                mesh.positions[3*v1+2]
+            );
 
-            assert(((*shapes)[i].mesh.positions.size() % 3) == 0);
+            glColor3f(0.f, 1.f, 0.f);
+            glVertex3f(
+                mesh.positions[3*v2+0],
+                mesh.positions[3*v2+1],
+                mesh.positions[3*v2+2]
+            );
 
-            for (unsigned int f = 0; f < (*shapes)[i].mesh.positions.size() / 3; ++f)
-            {
-                glVertex3f(
-                    (*shapes)[i].mesh.positions[3*f+0],
-                    (*shapes)[i].mesh.positions[3*f+1],
-                    (*shapes)[i].mesh.positions[3*f+2]
-                );
-            }
-
+            glEnd();
         }
 
-        glEnd();
-
-        // m_dataChanged = false;
     }
 
-    /* GLFW is ALWAYS double buffered; will call glFlush() */
     glfwSwapBuffers(m_window);
 }
 
 ObjViewer::ObjViewer() :
+    m_scale(1.0f),
     m_frameWidth(600),
     m_frameHeight(480),
     m_dataChanged(false)

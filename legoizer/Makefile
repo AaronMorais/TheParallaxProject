@@ -18,8 +18,9 @@ LDFLAGS :=
 LIB_DIR := \
 	-L lib \
 
+# glfw3 on Cygwin (and I think MinGW toolchains need )
 LIB := \
-	-l glfw3 \ # glfw3 on Cygwin (and I think MinGW toolchains need )
+	-l glfw3 \
 	-l opengl32 \
 	-l gdi32 \
 
@@ -42,7 +43,7 @@ test:
 	$(CC) $(CFLAGS) test/tester.cpp $(INC) $(LIB) -o $(TEST_TARGET)
 
 run: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) assets/minicooper.obj
+	$(PROJECT_TARGET) assets/teapot.obj
 
 .PHONY: clean
 

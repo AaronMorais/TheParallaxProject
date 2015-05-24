@@ -17,6 +17,7 @@ public:
 private:
     static void s_HandleKeyboard(GLFWwindow* wd, int key, int scancode, int action, int mods);
     static void s_HandleCharacter(GLFWwindow* wd, unsigned int key);
+    static void s_HandleScroll(GLFWwindow* wd, double xoffset, double yoffset);
     static void s_HandleError(int errcode, const char* desc);
     static void s_HandleQuit(GLFWwindow* wd);
     static void s_HandleFrameBufferReshape(GLFWwindow* wd, int w, int h);
@@ -24,6 +25,7 @@ private:
 
     void HandleKeyboard(GLFWwindow* wd, int key, int scancode, int action, int mods);
     void HandleCharacter(GLFWwindow* wd, unsigned int key);
+    void HandleScroll(GLFWwindow* wd, double xoffset, double yoffset);
     void HandleError(int errcode, const char* desc);
     void HandleQuit(GLFWwindow* wd);
     void HandleFrameBufferReshape(GLFWwindow* wd, int w, int h);
@@ -31,6 +33,7 @@ private:
 
     void Render();
 
+    float m_scale;
     int m_frameWidth;
     int m_frameHeight;
     GLFWwindow* m_window;
