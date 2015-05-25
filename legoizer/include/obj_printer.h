@@ -1,5 +1,5 @@
-#ifndef _OBJ_PRINT_H
-#define _OBJ_PRINT_H
+#ifndef _OBJ_PRINT_H__
+#define _OBJ_PRINT_H__
 
 #include "obj_data.h"
 #include "tiny_obj_loader.h"
@@ -16,7 +16,6 @@ public:
     static bool PrintFromData(std::shared_ptr<ObjData> data);
     static bool PrintFromFile(const char* filename, const char* basepath = NULL);
     static bool PrintFromStream(std::stringstream& objStream, std::string materials);
-
     static bool PrintFromDataToFile(std::shared_ptr<ObjData> data, const char* filename);
 private:
     static void PrintObjInfo(const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials);
