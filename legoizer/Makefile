@@ -54,7 +54,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.$(SRC_EXT)
 
 clean:
 	@echo "    Cleaning...";
-	@echo "    $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET)"; $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET)
+	@echo "    $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)"; $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)
 
 test: $(TEST_TARGET)
 
