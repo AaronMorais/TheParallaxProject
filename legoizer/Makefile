@@ -20,19 +20,23 @@ SOURCES := $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
 OBJECTS := $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.$(SRC_EXT)=.o))
 
 CFLAGS := -g -Wall -std=c++0x
-LDFLAGS :=
+LDFLAGS := --verbose
 
 LIB_DIR := \
 	-L lib \
+	-L /lib/w32api \
 
 # glfw3 on Cygwin (and I think MinGW toolchains need )
 LIB := \
+	-l glew32 \
 	-l glfw3 \
 	-l opengl32 \
 	-l gdi32 \
+	-l glu32 \
 
 INC := \
 	-I include \
+	-L /usr/include/w32api \
 
 all: $(PROJECT_TARGET) $(TEST_TARGET)
 

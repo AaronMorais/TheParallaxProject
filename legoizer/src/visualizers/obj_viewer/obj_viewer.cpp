@@ -40,6 +40,11 @@ ObjViewer::Run()
         exit(1);
     }
 
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
+
     /* make the window's context the current context */
     glfwMakeContextCurrent(m_window);
 
@@ -65,6 +70,7 @@ ObjViewer::Run()
     glfwSetScrollCallback(m_window, ObjViewer::GetInstance().s_HandleScroll);
 
     do {
+        HandleMotion();
         Render();
         glfwWaitEvents();
     } while (!glfwWindowShouldClose(m_window));
@@ -129,9 +135,32 @@ ObjViewer::HandleKeyboard(GLFWwindow* wd, int key, int scancode, int action, int
         return;
     }
 
+    float offset;
     switch (key) {
         case GLFW_KEY_ESCAPE:
             HandleQuit(wd);
+            break;
+
+        case GLFW_KEY_EQUAL:
+            m_scale = m_scale + 0.02f;
+        case GLFW_KEY_MINUS:
+            offset = m_scale - 0.01f;
+            if (offset > 50.0f)
+            {
+                offset = 50.0f;
+            }
+            if (offset < 0.001f)
+            {
+                offset = 0.001f;
+            }
+            m_scale = offset;
+            break;
+
+        case GLFW_KEY_UP:
+        case GLFW_KEY_DOWN:
+        case GLFW_KEY_LEFT:
+        case GLFW_KEY_RIGHT:
+        case GLFW_KEY_0:
             break;
         default:
             break;
@@ -151,20 +180,60 @@ ObjViewer::HandleCharacter(GLFWwindow* wd, unsigned int key)
 }
 
 void
+ObjViewer::HandleMotion()
+{
+    static double lastTime = glfwGetTime();
+    double currentTime = glfwGetTime();
+    float deltaTime = float(currentTime - lastTime);
+
+    double xpos, ypos;
+    glfwGetCursorPos(m_window, &xpos, &ypos);
+    glfwSetCursorPos(m_window, m_frameWidth/2, m_frameHeight/2);
+
+    m_horizontalAngle += m_mouseSpeed * float(m_frameWidth/2 - xpos);
+    m_verticalAngle += m_mouseSpeed * float(m_frameHeight/2 - ypos);
+
+    m_direction = glm::normalize(glm::vec3(
+        std::cos(m_verticalAngle) * std::sin(m_horizontalAngle),
+        std::sin(m_verticalAngle),
+        std::cos(m_verticalAngle) * std::cos(m_horizontalAngle)
+    ));
+
+    m_right = glm::normalize(glm::vec3(
+        std::sin(m_horizontalAngle - (3.14f / 2.0f)),
+        0.f,
+        std::cos(m_horizontalAngle - (3.14f / 2.0f))
+    ));
+
+    m_up = glm::cross(m_right, m_direction);
+
+    if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        m_position += m_direction * deltaTime * m_speed;
+    }
+    if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        m_position -= m_direction * deltaTime * m_speed;
+    }
+    if (glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+        m_position += m_right * deltaTime * m_speed;
+    }
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+        m_position -= m_right * deltaTime * m_speed;
+    }
+
+    // m_projectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    // m_viewMatrix = glm::lookAt(m_position, m_position + m_direction, m_up);
+
+    lastTime = currentTime;
+}
+
+void
 ObjViewer::HandleScroll(GLFWwindow* wd, double xoffset, double yoffset)
 {
-    std::cout << yoffset << std::endl;
 
-    float offset = m_scale + (double)yoffset * 0.01f;
-    if (offset > 50.0f)
-    {
-        offset = 50.0f;
-    }
-    if (offset < 0.001f)
-    {
-        offset = 0.001f;
-    }
-    m_scale = offset;
 }
 
 void
@@ -192,7 +261,7 @@ ObjViewer::HandleFrameBufferReshape(GLFWwindow* wd, int w, int h)
     set to first quadrant, fixed to the initial window dimension */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, (float)m_frameWidth, 0.0, (float)m_frameHeight, -1.f, 1.f);
+    glOrtho(0.0, (float)m_frameWidth, 0.0, (float)m_frameHeight, -1.f, 100.f);
 
     /* Tell OpenGL to use the whole window for drawing.
     Note that we don't resize the view volume, so
@@ -218,12 +287,18 @@ ObjViewer::Render()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+    // glOrtho(0.0, (float)m_frameWidth, -1.f, 1.f, -1.f, 1.f);
+    glOrtho(-ratio, ratio, -1.f, 1.f, 10.f, -10.f);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
+    // glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
 
+    // glTranslatef(0.f, 0.f, 0.f);
+    gluLookAt(
+        m_position.x, m_position.y, m_position.z,
+        0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f);
     glScalef(m_scale, m_scale, m_scale);
 
     auto shapes = m_data->m_shapes;
@@ -270,5 +345,10 @@ ObjViewer::ObjViewer() :
     m_frameHeight(480),
     m_dataChanged(false)
 {
+    m_position = glm::vec3(0, 0, 5);
 
+    m_horizontalAngle = 3.14f;
+    m_verticalAngle = 0.0f;
+    m_speed = 3.0f;
+    m_mouseSpeed = 0.005f;
 }

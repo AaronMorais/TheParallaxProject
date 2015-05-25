@@ -60,7 +60,7 @@ Voxelizer::Process(
     // std::cout << "m: " << m_minZ << ", " << m_maxZ << std::endl;
 
     float s = std::min(std::min((m_maxX - m_minX), (m_maxY - m_minY)), (m_maxZ - m_minZ));
-    m_subdivisions = 50;
+    m_subdivisions = 15;
     m_unit = s / m_subdivisions;
 
     // std::cout << "t: " << s << "," << m_unit << std::endl;
@@ -102,6 +102,9 @@ Voxelizer::Process(
         grid[x3][y3][z3] = 1;
     }
 
+    vertices.clear();
+    faces.clear();
+
     for (size_t i = 0; i < grid.size(); ++i)
     {
         for (size_t j = 0; j < grid[i].size(); ++j)
@@ -111,14 +114,14 @@ Voxelizer::Process(
                 if (grid[i][j][k] != 0)
                 {
                     size_t last = mesh.vertices.size() - 1;
-                    vertices.push_back(glm::vec3(i+0,j+0,k+0)); // 0
-                    vertices.push_back(glm::vec3(i+1,j+0,k+0)); // 1
-                    vertices.push_back(glm::vec3(i+0,j+1,k+0)); // 2
-                    vertices.push_back(glm::vec3(i+0,j+0,k+1)); // 3
-                    vertices.push_back(glm::vec3(i+1,j+1,k+0)); // 4
-                    vertices.push_back(glm::vec3(i+0,j+1,k+1)); // 5
-                    vertices.push_back(glm::vec3(i+1,j+0,k+1)); // 6
-                    vertices.push_back(glm::vec3(i+1,j+1,k+1)); // 7
+                    vertices.push_back(glm::vec3(i+0.0f-m_width/2,j+0.0f-m_height/2,k+0.0f-m_depth/2)); // 0
+                    vertices.push_back(glm::vec3(i+1.0f-m_width/2,j+0.0f-m_height/2,k+0.0f-m_depth/2)); // 1
+                    vertices.push_back(glm::vec3(i+0.0f-m_width/2,j+1.0f-m_height/2,k+0.0f-m_depth/2)); // 2
+                    vertices.push_back(glm::vec3(i+0.0f-m_width/2,j+0.0f-m_height/2,k+1.0f-m_depth/2)); // 3
+                    vertices.push_back(glm::vec3(i+1.0f-m_width/2,j+1.0f-m_height/2,k+0.0f-m_depth/2)); // 4
+                    vertices.push_back(glm::vec3(i+0.0f-m_width/2,j+1.0f-m_height/2,k+1.0f-m_depth/2)); // 5
+                    vertices.push_back(glm::vec3(i+1.0f-m_width/2,j+0.0f-m_height/2,k+1.0f-m_depth/2)); // 6
+                    vertices.push_back(glm::vec3(i+1.0f-m_width/2,j+1.0f-m_height/2,k+1.0f-m_depth/2)); // 7
 
                     faces.push_back(tinyobj::face_t(last+0, last+1, last+2));
                     faces.push_back(tinyobj::face_t(last+2, last+4, last+1));
