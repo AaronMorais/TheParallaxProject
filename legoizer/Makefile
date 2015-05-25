@@ -1,12 +1,19 @@
+print-%: ; @echo $*=$($*)
+
 CC := g++
 CC := i686-w64-mingw32-g++ # Compiler for Windows MinGW64
 # CC := clang --analyze # and comment out the linker last line for sanity
 
+ASSETS_DIR := assets
+BIN_DIR := bin
 SRC_DIR := src
 BUILD_DIR := build
 
-PROJECT_TARGET := bin/legoizer
-TEST_TARGET := bin/tester
+PROJECT_TARGET := $(BIN_DIR)/legoizer
+TEST_TARGET := $(BIN_DIR)/tester
+
+PROJECT_OBJECT := $(BUILD_DIR)/main.o
+TEST_OBJECT := $(BUILD_DIR)/tester.o
 
 SRC_EXT := cpp
 SOURCES := $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
@@ -27,9 +34,15 @@ LIB := \
 INC := \
 	-I include \
 
-$(PROJECT_TARGET): $(OBJECTS)
+all: $(PROJECT_TARGET) $(TEST_TARGET)
+
+$(PROJECT_TARGET): $(filter-out $(TEST_OBJECT), $(OBJECTS))
 	@echo "    Linking..."
 	@echo "    $(CC) $^ $(LIB_DIR) -o $(PROJECT_TARGET) $(LIB)"; $(CC) $(LDFLAGS) $^ $(LIB_DIR) -o $(PROJECT_TARGET) $(LIB)
+
+$(TEST_TARGET): $(filter-out $(PROJECT_OBJECT), $(OBJECTS))
+	@echo "    Linking..."
+	@echo "    $(CC) $^ $(LIB_DIR) -o $(PROJECT_TARGET) $(LIB)"; $(CC) $(LDFLAGS) $^ $(LIB_DIR) -o $(TEST_TARGET) $(LIB)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.$(SRC_EXT)
 	@mkdir -p $(@D)
@@ -39,12 +52,12 @@ clean:
 	@echo "    Cleaning...";
 	@echo "    $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET)"; $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET)
 
-test:
-	$(CC) $(CFLAGS) test/tester.cpp $(INC) $(LIB) -o $(TEST_TARGET)
+test: $(TEST_TARGET)
 
 run: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) assets/teapot.obj
+	$(PROJECT_TARGET) $(ASSETS_DIR)/teapot.obj
 
-.PHONY: clean
+run-tests: $(TEST_TARGET)
+	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
 
-print-%: ; @echo $*=$($*)
+.PHONY: all clean test run run-tests

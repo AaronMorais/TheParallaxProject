@@ -30,10 +30,18 @@
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include "tiny_obj_loader.h"
 
 namespace tinyobj {
+
+
+face_t::face_t(int v1, int v2, int v3) {
+  this->v1 = v1;
+  this->v2 = v2;
+  this->v3 = v3;
+}
 
 struct vertex_index {
   int v_idx, vt_idx, vn_idx;
@@ -106,7 +114,7 @@ static inline int parseInt(const char *&token) {
 //  Valid strings are for example:
 //   -0	 +3.1417e+2  -0.0E-3  1.0324  -1.41   11e2
 //
-// If the parsing is a success, result is set to the parsed value and true 
+// If the parsing is a success, result is set to the parsed value and true
 // is returned.
 //
 // The function is greedy and will parse until any of the following happens:
@@ -116,7 +124,7 @@ static inline int parseInt(const char *&token) {
 // The following situations triggers a failure:
 //  - s >= s_end.
 //  - parse failure.
-// 
+//
 static bool tryParseDouble(const char *s, const char *s_end, double *result)
 {
 	if (s >= s_end)
@@ -127,7 +135,7 @@ static bool tryParseDouble(const char *s, const char *s_end, double *result)
 	double mantissa = 0.0;
 	// This exponent is base 2 rather than 10.
 	// However the exponent we parse is supposed to be one of ten,
-	// thus we must take care to convert the exponent/and or the 
+	// thus we must take care to convert the exponent/and or the
 	// mantissa to a * 2^E, where a is the mantissa and E is the
 	// exponent.
 	// To get the final double we will use ldexp, it requires the
@@ -140,7 +148,7 @@ static bool tryParseDouble(const char *s, const char *s_end, double *result)
 	char exp_sign = '+';
 	char const *curr = s;
 
-	// How many characters were read in a loop. 
+	// How many characters were read in a loop.
 	int read = 0;
 	// Tells whether a loop terminated due to reaching s_end.
 	bool end_not_reached = false;
@@ -296,7 +304,9 @@ static vertex_index parseTriple(const char *&token, int vsize, int vnsize,
 
 static unsigned int
 updateVertex(std::map<vertex_index, unsigned int> &vertexCache,
-             std::vector<float> &positions, std::vector<float> &normals,
+             std::vector<float> &positions,
+             std::vector<glm::vec3> &vertices,
+             std::vector<float> &normals,
              std::vector<float> &texcoords,
              const std::vector<float> &in_positions,
              const std::vector<float> &in_normals,
@@ -313,6 +323,12 @@ updateVertex(std::map<vertex_index, unsigned int> &vertexCache,
   positions.push_back(in_positions[3 * i.v_idx + 0]);
   positions.push_back(in_positions[3 * i.v_idx + 1]);
   positions.push_back(in_positions[3 * i.v_idx + 2]);
+
+  vertices.push_back(
+    glm::vec3(
+      in_positions[3 * i.v_idx + 0],
+      in_positions[3 * i.v_idx + 1],
+      in_positions[3 * i.v_idx + 2]));
 
   if (i.vn_idx >= 0) {
     normals.push_back(in_normals[3 * i.vn_idx + 0]);
@@ -378,18 +394,20 @@ static bool exportFaceGroupToShape(
       i2 = face[k];
 
       unsigned int v0 = updateVertex(
-          vertexCache, shape.mesh.positions, shape.mesh.normals,
+          vertexCache, shape.mesh.positions, shape.mesh.vertices, shape.mesh.normals,
           shape.mesh.texcoords, in_positions, in_normals, in_texcoords, i0);
       unsigned int v1 = updateVertex(
-          vertexCache, shape.mesh.positions, shape.mesh.normals,
+          vertexCache, shape.mesh.positions, shape.mesh.vertices, shape.mesh.normals,
           shape.mesh.texcoords, in_positions, in_normals, in_texcoords, i1);
       unsigned int v2 = updateVertex(
-          vertexCache, shape.mesh.positions, shape.mesh.normals,
+          vertexCache, shape.mesh.positions, shape.mesh.vertices, shape.mesh.normals,
           shape.mesh.texcoords, in_positions, in_normals, in_texcoords, i2);
 
       shape.mesh.indices.push_back(v0);
       shape.mesh.indices.push_back(v1);
       shape.mesh.indices.push_back(v2);
+
+      shape.mesh.faces.push_back(face_t(v0, v1, v2));
 
       shape.mesh.material_ids.push_back(material_id);
     }

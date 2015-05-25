@@ -155,14 +155,14 @@ ObjViewer::HandleScroll(GLFWwindow* wd, double xoffset, double yoffset)
 {
     std::cout << yoffset << std::endl;
 
-    float offset = m_scale + (double)yoffset * 0.0f;
-    if (offset > 5.0f)
+    float offset = m_scale + (double)yoffset * 0.01f;
+    if (offset > 50.0f)
     {
-        offset = 5.0f;
+        offset = 50.0f;
     }
-    if (offset < 0.01f)
+    if (offset < 0.001f)
     {
-        offset = 0.01f;
+        offset = 0.001f;
     }
     m_scale = offset;
 }
@@ -214,11 +214,11 @@ ObjViewer::Render()
 {
     float ratio = m_frameWidth / (float) m_frameHeight;
 
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+    glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -228,36 +228,32 @@ ObjViewer::Render()
 
     auto shapes = m_data->m_shapes;
 
-    for (unsigned int i = 0; i < shapes->size(); ++i)
+    for (size_t i = 0; i < shapes->size(); ++i)
     {
         tinyobj::mesh_t mesh = (*shapes)[i].mesh;
-        for (size_t f = 0; f < mesh.indices.size() / 3; ++f) {
-
+        for (size_t f = 0; f < mesh.faces.size(); ++f)
+        {
             glBegin(GL_TRIANGLES);
 
-            int v0 = mesh.indices[3*f+0];
-            int v1 = mesh.indices[3*f+1];
-            int v2 = mesh.indices[3*f+2];
-
-            glColor3f(1.f, 0.f, 0.f);
+            glColor3f(1.f, 1.f, 1.f);
             glVertex3f(
-                mesh.positions[3*v0+0],
-                mesh.positions[3*v0+1],
-                mesh.positions[3*v0+2]
+                mesh.vertices[mesh.faces[f].v1].x,
+                mesh.vertices[mesh.faces[f].v1].y,
+                mesh.vertices[mesh.faces[f].v1].z
             );
 
-            glColor3f(0.f, 1.f, 0.f);
+            glColor3f(1.f, 1.f, 1.f);
             glVertex3f(
-                mesh.positions[3*v1+0],
-                mesh.positions[3*v1+1],
-                mesh.positions[3*v1+2]
+                mesh.vertices[mesh.faces[f].v2].x,
+                mesh.vertices[mesh.faces[f].v2].y,
+                mesh.vertices[mesh.faces[f].v2].z
             );
 
-            glColor3f(0.f, 1.f, 0.f);
+            glColor3f(1.f, 1.f, 1.f);
             glVertex3f(
-                mesh.positions[3*v2+0],
-                mesh.positions[3*v2+1],
-                mesh.positions[3*v2+2]
+                mesh.vertices[mesh.faces[f].v3].x,
+                mesh.vertices[mesh.faces[f].v3].y,
+                mesh.vertices[mesh.faces[f].v3].z
             );
 
             glEnd();

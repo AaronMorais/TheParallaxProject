@@ -3,14 +3,22 @@
 //
 // Licensed under 2-clause BSD liecense.
 //
-#ifndef _TINY_OBJ_LOADER_H
-#define _TINY_OBJ_LOADER_H
+#ifndef _TINY_OBJ_LOADER_H__
+#define _TINY_OBJ_LOADER_H__
 
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 #include <map>
 
 namespace tinyobj {
+
+struct face_t {
+  int v1;
+  int v2;
+  int v3;
+  face_t(int v1, int v2, int v3);
+};
 
 typedef struct {
   std::string name;
@@ -38,6 +46,8 @@ typedef struct {
   std::vector<float> normals;
   std::vector<float> texcoords;
   std::vector<unsigned int> indices;
+  std::vector<glm::vec3> vertices;
+  std::vector<face_t> faces;
   std::vector<int> material_ids; // per-mesh material ID
 } mesh_t;
 

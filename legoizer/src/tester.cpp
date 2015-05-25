@@ -1,6 +1,7 @@
 #include "obj_viewer.h"
 #include "obj_printer.h"
 #include "obj_data.h"
+#include "voxelizer.h"
 
 #include <iostream>
 
@@ -22,9 +23,17 @@ main(
     return 1;
   }
 
-  ObjPrint::PrintFromData(data);
+  // ObjPrint::PrintFromData(data);
 
-  std::cout << "Completed" << std::endl;
+  std::shared_ptr<Voxelizer> voxelizer = std::make_shared<Voxelizer>();
+
+  auto vData = voxelizer->Process(data);
+
+  ObjViewer::GetInstance().SetData(vData);
+
+  ObjViewer::GetInstance().Run();
+
+  std::cout << "Test Completed" << std::endl;
 
   return 0;
 }

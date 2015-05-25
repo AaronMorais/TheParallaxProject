@@ -63,8 +63,8 @@ int Legoizer::dist(Legoizer::Vertex v1, Legoizer::Vertex v2) {
 
 bool Legoizer::minimumFaceSize(Face face) {
   return dist(face.vertices[0], face.vertices[1]) == 0 &&
-          dist(face.vertices[1], face.vertices[2]) == 0 &&
-          dist(face.vertices[0], face.vertices[2]) == 0;
+         dist(face.vertices[1], face.vertices[2]) == 0 &&
+         dist(face.vertices[0], face.vertices[2]) == 0;
 }
 
 void Legoizer::process(Face face) {
