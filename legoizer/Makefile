@@ -40,9 +40,9 @@ INC := \
 
 all: $(PROJECT_TARGET) $(TEST_TARGET)
 
-$(PROJECT_TARGET): $(filter-out $(TEST_OBJECT), $(OBJECTS))
+$(PROJECT_TARGET): $(filter-out $(TEST_OBJECT) $(BUILD_DIR)/visualizers/obj_viewer/obj_viewer.o, $(OBJECTS))
 	@echo "    Linking..."
-	@echo "    $(CC) $^ $(LIB_DIR) -o $(PROJECT_TARGET) $(LIB)"; $(CC) $(LDFLAGS) $^ $(LIB_DIR) -o $(PROJECT_TARGET) $(LIB)
+	@echo "    $(CC) $^ $(LIB_DIR) -o $(PROJECT_TARGET) $(LIB)"; $(CC) $(LDFLAGS) $^ $(LIB_DIR) -o $(PROJECT_TARGET) -libstdc++6
 
 $(TEST_TARGET): $(filter-out $(PROJECT_OBJECT), $(OBJECTS))
 	@echo "    Linking..."
