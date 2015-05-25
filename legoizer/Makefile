@@ -20,7 +20,7 @@ SOURCES := $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
 OBJECTS := $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.$(SRC_EXT)=.o))
 
 CFLAGS := -g -Wall -std=c++0x
-LDFLAGS := --verbose
+LDFLAGS := # --verbose
 
 LIB_DIR := \
 	-L lib \

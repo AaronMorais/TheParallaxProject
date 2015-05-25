@@ -29,9 +29,17 @@ main(
 
   auto vData = voxelizer->Process(data);
 
+    tinyobj::mesh_t& meshie = (*(vData->m_shapes))[0].mesh;
+    std::vector<tinyobj::face_t>& faces = meshie.faces;
+    std::vector<glm::vec3>& vertices = meshie.vertices;
+
+    // std::cout <<"poo2: " << meshie.vertices[meshie.faces[0].v1].x << ", " << meshie.vertices[meshie.faces[0].v1].y << ", " << meshie.vertices[meshie.faces[0].v1].z << std::endl;
+
+
   ObjViewer::GetInstance().SetData(vData);
 
   ObjViewer::GetInstance().Run();
+
 
   std::cout << "Test Completed" << std::endl;
 

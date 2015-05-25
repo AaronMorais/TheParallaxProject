@@ -22,6 +22,13 @@ ObjViewer::SetData(
 )
 {
     m_data = data;
+
+    tinyobj::mesh_t& meshie = (*(m_data->m_shapes))[0].mesh;
+    std::vector<tinyobj::face_t>& faces = meshie.faces;
+    std::vector<glm::vec3>& vertices = meshie.vertices;
+
+    // std::cout <<"poo4: " << meshie.vertices[meshie.faces[0].v1].x << ", " << meshie.vertices[meshie.faces[0].v1].y << ", " << meshie.vertices[meshie.faces[0].v1].z << std::endl;
+
     m_dataChanged = true;
 }
 
@@ -33,17 +40,19 @@ ObjViewer::Run()
         exit(1);
     }
 
+    glEnable(GL_DEPTH_TEST);
+    // glDisable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
+    // glEnable(GL_BACK);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
+
     /* create the window and its associated OpenGL context */
     m_window = glfwCreateWindow(m_frameWidth, m_frameHeight, "GLFW Window", NULL, NULL);
     if (!m_window) {
         glfwTerminate();
         exit(1);
     }
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glDepthFunc(GL_LEQUAL);
-    glDepthMask(GL_FALSE);
 
     /* make the window's context the current context */
     glfwMakeContextCurrent(m_window);
@@ -68,6 +77,7 @@ ObjViewer::Run()
     glfwSetKeyCallback(m_window, ObjViewer::GetInstance().s_HandleKeyboard);      // general keyboard input
     glfwSetCharCallback(m_window, ObjViewer::GetInstance().s_HandleCharacter);  // ser specific character handling
     glfwSetScrollCallback(m_window, ObjViewer::GetInstance().s_HandleScroll);
+
 
     do {
         HandleMotion();
@@ -190,9 +200,7 @@ ObjViewer::HandleMotion()
     glfwGetCursorPos(m_window, &xpos, &ypos);
     glfwSetCursorPos(m_window, m_frameWidth/2, m_frameHeight/2);
 
-    m_horizontalAngle += m_mouseSpeed * float(m_frameWidth/2 - xpos);
-    m_verticalAngle += m_mouseSpeed * float(m_frameHeight/2 - ypos);
-
+    m_horizontalAngle += m_speed;
     m_direction = glm::normalize(glm::vec3(
         std::cos(m_verticalAngle) * std::sin(m_horizontalAngle),
         std::sin(m_verticalAngle),
@@ -209,19 +217,24 @@ ObjViewer::HandleMotion()
 
     if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
     {
-        m_position += m_direction * deltaTime * m_speed;
+        // m_position += m_direction * deltaTime * m_speed;
+         m_verticalAngle += m_speed;// * float(m_frameHeight/2 - ypos);
     }
     if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-        m_position -= m_direction * deltaTime * m_speed;
+        // m_position -= m_direction * deltaTime * m_speed;
+         m_verticalAngle -= m_speed;// * float(m_frameHeight/2 - ypos);
     }
     if (glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
-        m_position += m_right * deltaTime * m_speed;
+     //   m_position += m_right * deltaTime * m_speed;
+        m_horizontalAngle -= m_speed;// * float(m_frameWidth/2 - xpos);
+
     }
     if (glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
     {
-        m_position -= m_right * deltaTime * m_speed;
+       // m_position -= m_right * deltaTime * m_speed;
+        m_horizontalAngle += m_speed;// * float(m_frameWidth/2 - xpos);
     }
 
     // m_projectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -281,50 +294,70 @@ ObjViewer::HandleWindowReshape(GLFWwindow* wd, int w, int h)
 void
 ObjViewer::Render()
 {
+
+    if (m_data != nullptr)
+         {
+
+    tinyobj::mesh_t& meshiexx = (*(m_data->m_shapes))[0].mesh;
+    // std::cout <<"poo5: " << meshiexx.vertices[meshiexx.faces[0].v1].x << ", " << meshiexx.vertices[meshiexx.faces[0].v1].y << ", " << meshiexx.vertices[meshiexx.faces[0].v1].z << std::endl;
+
+         }
+
     float ratio = m_frameWidth / (float) m_frameHeight;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glClearColor(0.20f, 0.59f, 0.85f, 1.0f);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // glOrtho(0.0, (float)m_frameWidth, -1.f, 1.f, -1.f, 1.f);
-    glOrtho(-ratio, ratio, -1.f, 1.f, 10.f, -10.f);
+    glOrtho(-ratio, ratio, -1.f, 1.f, 100.f, -100.f);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    // glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
 
-    // glTranslatef(0.f, 0.f, 0.f);
     gluLookAt(
         m_position.x, m_position.y, m_position.z,
         0.f, 0.f, 0.f,
         0.f, 1.f, 0.f);
     glScalef(m_scale, m_scale, m_scale);
 
+
     auto shapes = m_data->m_shapes;
 
+    size_t num_triangles = 4;
+
+    glPushMatrix();
+    glRotatef(m_horizontalAngle, 0, 1, 0);
+    glRotatef(m_verticalAngle, 1, 0, 0);
     for (size_t i = 0; i < shapes->size(); ++i)
     {
-        tinyobj::mesh_t mesh = (*shapes)[i].mesh;
+        tinyobj::mesh_t& mesh = (*shapes)[i].mesh;
+    // std::cout << mesh.vertices[mesh.faces[0].v1].x << ", " << mesh.vertices[mesh.faces[0].v1].y << ", " << mesh.vertices[mesh.faces[0].v1].z << std::endl;
         for (size_t f = 0; f < mesh.faces.size(); ++f)
         {
+            // std::cout << "f: " << f << std::endl;
             glBegin(GL_TRIANGLES);
 
-            glColor3f(1.f, 1.f, 1.f);
+            float randomfucker = f * rand() / RAND_MAX;
+            // std::cout << mesh.vertices[mesh.faces[f].v1].x << ", " << mesh.vertices[mesh.faces[f].v1].y << ", " << mesh.vertices[mesh.faces[f].v1].z << std::endl;
+            glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
             glVertex3f(
                 mesh.vertices[mesh.faces[f].v1].x,
                 mesh.vertices[mesh.faces[f].v1].y,
                 mesh.vertices[mesh.faces[f].v1].z
             );
 
-            glColor3f(1.f, 1.f, 1.f);
+            // std::cout << mesh.vertices[mesh.faces[f].v2].x << ", " << mesh.vertices[mesh.faces[f].v2].y << ", " << mesh.vertices[mesh.faces[f].v2].z << std::endl;
+            glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
             glVertex3f(
                 mesh.vertices[mesh.faces[f].v2].x,
                 mesh.vertices[mesh.faces[f].v2].y,
                 mesh.vertices[mesh.faces[f].v2].z
             );
 
-            glColor3f(1.f, 1.f, 1.f);
+            // std::cout << mesh.vertices[mesh.faces[f].v3].x << ", " << mesh.vertices[mesh.faces[f].v3].y << ", " << mesh.vertices[mesh.faces[f].v3].z << std::endl;
+            glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
             glVertex3f(
                 mesh.vertices[mesh.faces[f].v3].x,
                 mesh.vertices[mesh.faces[f].v3].y,
@@ -336,19 +369,21 @@ ObjViewer::Render()
 
     }
 
+    glPopMatrix();
+
     glfwSwapBuffers(m_window);
 }
 
 ObjViewer::ObjViewer() :
     m_scale(1.0f),
-    m_frameWidth(600),
-    m_frameHeight(480),
+    m_frameWidth(1920),
+    m_frameHeight(1080),
     m_dataChanged(false)
 {
     m_position = glm::vec3(0, 0, 5);
 
     m_horizontalAngle = 3.14f;
     m_verticalAngle = 0.0f;
-    m_speed = 3.0f;
+    m_speed = 0.5f;
     m_mouseSpeed = 0.005f;
 }
