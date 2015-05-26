@@ -53,6 +53,7 @@ app.get('/', function(req,res){
 
 io.on('connection', function (socket) {
   socket.on('job', function (data) {
+    console.log("Job request received");
     var params = {
       MessageBody: JSON.stringify(data),
       QueueUrl: input_queue_url,

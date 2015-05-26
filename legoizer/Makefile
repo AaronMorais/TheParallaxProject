@@ -1,7 +1,7 @@
 print-%: ; @echo $*=$($*)
 
 CC := g++
-CC := i686-w64-mingw32-g++ # Compiler for Windows MinGW64
+# CC := i686-w64-mingw32-g++ # Compiler for Windows MinGW64
 # CC := clang --analyze # and comment out the linker last line for sanity
 
 ASSETS_DIR := assets
