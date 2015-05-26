@@ -38,7 +38,7 @@ output_queue = conn.get_queue("output-queue")
 
 
 def run_job(obj):
-    print("Running Job", obj)
+    print("Running Job")
     job_file = open("job_data", "w")
     job_file.write(obj)
     job_file.close()
