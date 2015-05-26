@@ -58,21 +58,13 @@ Voxelizer::Process(
             }
         }
 
-        // std::cout << "m: " << m_minX << ", " << m_maxX << std::endl;
-        // std::cout << "m: " << m_minY << ", " << m_maxY << std::endl;
-        // std::cout << "m: " << m_minZ << ", " << m_maxZ << std::endl;
-
         float s = std::min(std::min((m_maxX - m_minX), (m_maxY - m_minY)), (m_maxZ - m_minZ));
         m_subdivisions = 10;
         m_unit = s / m_subdivisions;
 
-        // std::cout << "t: " << s << "," << m_unit << std::endl;
-
         m_width = std::ceil((m_maxX - m_minX) / m_unit) + 1;
         m_height = std::ceil((m_maxY - m_minY) / m_unit) + 1;
         m_depth = std::ceil((m_maxZ - m_minZ) / m_unit) + 1;
-
-        // std::cout << "x:" << m_width << ", y:" << m_height << ", z:" << m_depth << std::endl;
 
         std::vector<std::vector<std::vector<int>>> grid =
             std::vector<std::vector<std::vector<int>>>(m_width,
@@ -97,11 +89,8 @@ Voxelizer::Process(
             int y3 = std::floor((v3.y - m_minY) / m_unit);
             int z3 = std::floor((v3.z - m_minZ) / m_unit);
 
-            // std::cout << "v1: " << x1 << "," << y1 << "," << z1 << std::endl;
             grid[x1][y1][z1] = 1;
-            // std::cout << "v2: " << x2 << "," << y2 << "," << z2 << std::endl;
             grid[x2][y2][z2] = 1;
-            // std::cout << "v3: " << x3 << "," << y3 << "," << z3 << std::endl;
             grid[x3][y3][z3] = 1;
         }
 
@@ -119,8 +108,6 @@ Voxelizer::Process(
                         size_t last = mesh.vertices.size();
                         vertices.push_back(glm::vec3(i+0.0f+0.001f,j+0.0f+0.001f,k+0.0f+0.001f)); // 0
                         vertices.push_back(glm::vec3(i+1.0f+0.001f,j+0.0f+0.001f,k+0.0f+0.001f)); // 1
-                        // std::cerr << "index = " << last << " " << vertices[last].x << " " << vertices[last].y << " " << vertices[last].z << "\n";
-                        // std::cerr << "index = " << last+1 << " " << vertices[last+1].x << " " << vertices[last+1].y << " " << vertices[last+1].z << "\n";
                         vertices.push_back(glm::vec3(i+0.0f+0.001f,j+1.0f+0.001f,k+0.0f+0.001f)); // 2
                         vertices.push_back(glm::vec3(i+0.0f+0.001f,j+0.0f+0.001f,k+1.0f+0.001f)); // 3
                         vertices.push_back(glm::vec3(i+1.0f+0.001f,j+1.0f+0.001f,k+0.0f+0.001f)); // 4
@@ -145,22 +132,11 @@ Voxelizer::Process(
 
                         faces.push_back(tinyobj::face_t(last+5, last+6, last+7));
                         faces.push_back(tinyobj::face_t(last+5, last+3, last+6));
-
-
-            // std::cout << mesh.vertices[mesh.faces[0].v1].x << [mesh.faces[0].v1].y << ", " << mesh.vertices[mesh.faces[0].v1].z << std::endl;
-
                     }
                 }
             }
         }
     }
-
-
-    tinyobj::mesh_t& meshie = (*(data->m_shapes))[0].mesh;
-    std::vector<tinyobj::face_t>& faces = meshie.faces;
-    std::vector<glm::vec3>& vertices = meshie.vertices;
-
-    // std::cout <<"poo: " << meshie.vertices[meshie.faces[0].v1].x << ", " << meshie.vertices[meshie.faces[0].v1].y << ", " << meshie.vertices[meshie.faces[0].v1].z << std::endl;
 
     return data;
 }

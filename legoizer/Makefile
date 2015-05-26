@@ -69,6 +69,6 @@ run: $(PROJECT_TARGET)
 	$(PROJECT_TARGET) $(ASSETS_DIR)/teapot.obj
 
 run-tests: $(TEST_TARGET)
-	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
+	$(TEST_TARGET) $(ASSETS_DIR)/minicooper.obj
 
 .PHONY: all clean test run run-tests

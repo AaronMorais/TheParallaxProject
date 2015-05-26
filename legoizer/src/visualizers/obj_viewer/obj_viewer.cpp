@@ -23,12 +23,6 @@ ObjViewer::SetData(
 {
     m_data = data;
 
-    tinyobj::mesh_t& meshie = (*(m_data->m_shapes))[0].mesh;
-    std::vector<tinyobj::face_t>& faces = meshie.faces;
-    std::vector<glm::vec3>& vertices = meshie.vertices;
-
-    // std::cout <<"poo4: " << meshie.vertices[meshie.faces[0].v1].x << ", " << meshie.vertices[meshie.faces[0].v1].y << ", " << meshie.vertices[meshie.faces[0].v1].z << std::endl;
-
     m_dataChanged = true;
 }
 
@@ -295,14 +289,6 @@ void
 ObjViewer::Render()
 {
 
-    if (m_data != nullptr)
-         {
-
-    tinyobj::mesh_t& meshiexx = (*(m_data->m_shapes))[0].mesh;
-    // std::cout <<"poo5: " << meshiexx.vertices[meshiexx.faces[0].v1].x << ", " << meshiexx.vertices[meshiexx.faces[0].v1].y << ", " << meshiexx.vertices[meshiexx.faces[0].v1].z << std::endl;
-
-         }
-
     float ratio = m_frameWidth / (float) m_frameHeight;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -333,14 +319,11 @@ ObjViewer::Render()
     for (size_t i = 0; i < shapes->size(); ++i)
     {
         tinyobj::mesh_t& mesh = (*shapes)[i].mesh;
-    // std::cout << mesh.vertices[mesh.faces[0].v1].x << ", " << mesh.vertices[mesh.faces[0].v1].y << ", " << mesh.vertices[mesh.faces[0].v1].z << std::endl;
         for (size_t f = 0; f < mesh.faces.size(); ++f)
         {
-            // std::cout << "f: " << f << std::endl;
             glBegin(GL_TRIANGLES);
 
             float randomfucker = f * rand() / RAND_MAX;
-            // std::cout << mesh.vertices[mesh.faces[f].v1].x << ", " << mesh.vertices[mesh.faces[f].v1].y << ", " << mesh.vertices[mesh.faces[f].v1].z << std::endl;
             glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
             glVertex3f(
                 mesh.vertices[mesh.faces[f].v1].x,
@@ -348,7 +331,6 @@ ObjViewer::Render()
                 mesh.vertices[mesh.faces[f].v1].z
             );
 
-            // std::cout << mesh.vertices[mesh.faces[f].v2].x << ", " << mesh.vertices[mesh.faces[f].v2].y << ", " << mesh.vertices[mesh.faces[f].v2].z << std::endl;
             glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
             glVertex3f(
                 mesh.vertices[mesh.faces[f].v2].x,
@@ -356,7 +338,6 @@ ObjViewer::Render()
                 mesh.vertices[mesh.faces[f].v2].z
             );
 
-            // std::cout << mesh.vertices[mesh.faces[f].v3].x << ", " << mesh.vertices[mesh.faces[f].v3].y << ", " << mesh.vertices[mesh.faces[f].v3].z << std::endl;
             glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
             glVertex3f(
                 mesh.vertices[mesh.faces[f].v3].x,

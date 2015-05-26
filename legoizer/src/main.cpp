@@ -1,6 +1,6 @@
-#include "obj_viewer.h"
 #include "obj_printer.h"
 #include "obj_data.h"
+#include "voxelizer.h"
 
 #include <iostream>
 
@@ -22,7 +22,11 @@ main(
     return 1;
   }
 
-  ObjPrint::PrintFromData(data);
+  std::shared_ptr<Voxelizer> voxelizer = std::make_shared<Voxelizer>();
+
+  std::shared_ptr<ObjData> vData = voxelizer->Process(data);
+
+  ObjPrint::PrintFromDataToFile(vData, "test.obj");
 
   std::cout << "Completed" << std::endl;
 

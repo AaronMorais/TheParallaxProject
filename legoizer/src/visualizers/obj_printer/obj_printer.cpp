@@ -124,28 +124,32 @@ ObjPrint::PrintFromStream(std::stringstream& objStream, std::string matString)
 }
 
 bool
-PrintFromDataToFile(std::shared_ptr<ObjData> data, const char* filename)
+ObjPrint::PrintFromDataToFile(std::shared_ptr<ObjData> data, const char* filename)
 {
-    std::fstream ofs(filename);
+    std::ofstream ofs(filename);
     if (!ofs) {
         std::cerr << "Cannot open file [" << filename << "]" << std::endl;
         return false;
     }
 
     std::shared_ptr<std::vector<tinyobj::shape_t>> shapes = data->m_shapes;
-    tinyobj::mesh_t& mesh = (*shapes)[0].mesh;
 
-    std::vector<glm::vec3>& vertices = mesh.vertices;
-    std::vector<tinyobj::face_t>& faces = mesh.faces;
+    for (unsigned int pp = 0; pp < shapes->size(); ++pp)
+    {
+        ofs << std::endl << "g" << std::endl;
+        tinyobj::mesh_t& mesh = (*shapes)[pp].mesh;
+        std::vector<glm::vec3>& vertices = mesh.vertices;
+        std::vector<tinyobj::face_t>& faces = mesh.faces;
 
-    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-        glm::vec3 vertex = *it;
-        ofs << "v " << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
-    }
-    ofs << std::endl;
-    for (auto it = faces.begin() ; it != faces.end(); ++it) {
-        tinyobj::face_t face = *it;
-        ofs << "f " << face.v1 << " " << face.v2 << " " << face.v3 << std::endl;
+        for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+            glm::vec3 vertex = *it;
+            ofs << "v " << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
+        }
+        ofs << std::endl;
+        for (auto it = faces.begin() ; it != faces.end(); ++it) {
+            tinyobj::face_t face = *it;
+            ofs << "f " << face.v1 << " " << face.v2 << " " << face.v3 << std::endl;
+        }
     }
 
     return true;
