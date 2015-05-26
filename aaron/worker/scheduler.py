@@ -32,9 +32,6 @@ def run_job(obj):
 def process_jobs():
     jobs = input_queue.get_messages(num_messages=10)
 
-    if not jobs:
-        break
-
     for job in jobs:
         job_body = job.get_body()
         print("Received job", job_body)
