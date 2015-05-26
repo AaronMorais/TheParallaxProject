@@ -45,7 +45,7 @@ def run_job(obj):
     os.system("~/legolizer/TheParallaxProject/legoizer/build/legoizer \
         ~/legolizer/TheParallaxProject/aaron/worker/job_data")
     result = open("../../legoizer/build/result.obj", "r").read()
-    result = (data[:1000] + '...') if len(result) > 1000 else result
+    result = (result[:1000] + '...') if len(result) > 1000 else result
     return result
 
 
