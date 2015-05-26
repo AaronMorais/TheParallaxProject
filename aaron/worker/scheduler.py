@@ -49,24 +49,20 @@ def run_job(obj):
 
 
 def process_jobs():
-    while True:
-        jobs = input_queue.get_messages(num_messages=10)
+    jobs = input_queue.get_messages(num_messages=1)
 
-        if not jobs:
-            break
+    for job in jobs:
+	    job_body = job.get_body()
+	    print("Received job")
+	    result = run_job(job_body)
 
-        for job in jobs:
-            job_body = job.get_body()
-            print("Received job")
-            result = run_job(job_body)
+	    new_message = boto.sqs.message.Message()
+	    new_message.set_body(result)
+	    output_queue.write(new_message)
 
-            new_message = boto.sqs.message.Message()
-            new_message.set_body(result)
-            output_queue.write(new_message)
+	    print("Sent Job")
 
-            print("Sent Job", json.dumps(result))
-
-            input_queue.delete_message(job)
+	    input_queue.delete_message(job)
 
 
 scheduler.add_job(process_jobs, "interval", seconds=1)
