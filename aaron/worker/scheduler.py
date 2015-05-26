@@ -42,7 +42,7 @@ def run_job(obj):
     job_file = open("job_data", "w")
     job_file.write(obj)
     job_file.close()
-    os.system("../../legoizer/build/legoizer job_data")
+    # os.system("../../legoizer/build/legoizer job_data")
     result = open("../../legoizer/build/result.obj", "r").read()
     result = (result[:1000] + '...') if len(result) > 1000 else result
     return result
