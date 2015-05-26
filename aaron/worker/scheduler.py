@@ -45,6 +45,7 @@ def run_job(obj):
     os.system("~/legolizer/TheParallaxProject/legoizer/build/legoizer \
         ~/legolizer/TheParallaxProject/aaron/worker/job_data")
     result = open("../../legoizer/build/result.obj", "r").read()
+    result = (data[:1000] + '...') if len(result) > 1000 else result
     return result
 
 
@@ -57,7 +58,7 @@ def process_jobs():
 
         for job in jobs:
             job_body = job.get_body()
-            print("Received job", job_body)
+            print("Received job")
             result = run_job(job_body)
 
             new_message = boto.sqs.message.Message()
