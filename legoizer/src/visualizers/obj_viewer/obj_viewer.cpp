@@ -186,9 +186,9 @@ ObjViewer::HandleCharacter(GLFWwindow* wd, unsigned int key)
 void
 ObjViewer::HandleMotion()
 {
-    static double lastTime = glfwGetTime();
-    double currentTime = glfwGetTime();
-    float deltaTime = float(currentTime - lastTime);
+    // static double lastTime = glfwGetTime();
+    // double currentTime = glfwGetTime();
+    // float deltaTime = float(currentTime - lastTime);
 
     double xpos, ypos;
     glfwGetCursorPos(m_window, &xpos, &ypos);
@@ -234,7 +234,7 @@ ObjViewer::HandleMotion()
     // m_projectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // m_viewMatrix = glm::lookAt(m_position, m_position + m_direction, m_up);
 
-    lastTime = currentTime;
+    // lastTime = currentTime;
 }
 
 void
@@ -310,8 +310,6 @@ ObjViewer::Render()
 
 
     auto shapes = m_data->m_shapes;
-
-    size_t num_triangles = 4;
 
     glPushMatrix();
     glRotatef(m_horizontalAngle, 0, 1, 0);

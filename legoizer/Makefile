@@ -66,9 +66,21 @@ clean:
 test: $(TEST_TARGET)
 
 run: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) $(ASSETS_DIR)/teapot.obj
+	$(PROJECT_TARGET) $(ASSETS_DIR)/teddy.obj
 
 run-tests: $(TEST_TARGET)
-	$(TEST_TARGET) $(ASSETS_DIR)/minicooper.obj
+	$(TEST_TARGET) $(ASSETS_DIR)/teddy.obj
+
+
+run-test-cow: $(TEST_TARGET)
+	$(TEST_TARGET) $(ASSETS_DIR)/cow.obj
+
+run-test-teddy: $(TEST_TARGET)
+	$(TEST_TARGET) $(ASSETS_DIR)/teddy.obj
+
+run-test-teapot: $(TEST_TARGET)
+	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
+
+
 
 .PHONY: all clean test run run-tests

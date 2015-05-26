@@ -59,7 +59,7 @@ Voxelizer::Process(
         }
 
         float s = std::min(std::min((m_maxX - m_minX), (m_maxY - m_minY)), (m_maxZ - m_minZ));
-        m_subdivisions = 10;
+        m_subdivisions = 40;
         m_unit = s / m_subdivisions;
 
         m_width = std::ceil((m_maxX - m_minX) / m_unit) + 1;
