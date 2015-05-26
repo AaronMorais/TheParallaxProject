@@ -3,6 +3,7 @@ Scheduled/recurring tasks.
 """
 from __future__ import absolute_import, print_function, unicode_literals
 import json
+import os
 
 import boto.sqs
 
@@ -18,8 +19,13 @@ output_queue = conn.get_queue("output-queue")
 
 def run_job(obj):
     print("Running Job", obj)
-
-    result = "SOME RANDOM STRING FROM THE WORKER"
+    job_file = open("job_data", "w")
+    job_file.write(obj)
+    job_file.close()
+    os.system("~/legolizer/TheParallaxProject/legoizer/build/legoizer \
+        ~/legolizer/TheParallaxProject/aaron/worker/job_data")
+    result = open("~/legolizer/TheParallaxProject/legoizer/build/result.obj",
+                  "r").read()
     return result
 
 
