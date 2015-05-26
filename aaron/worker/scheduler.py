@@ -44,8 +44,7 @@ def run_job(obj):
     job_file.close()
     os.system("~/legolizer/TheParallaxProject/legoizer/build/legoizer \
         ~/legolizer/TheParallaxProject/aaron/worker/job_data")
-    result = open("~/legolizer/TheParallaxProject/legoizer/build/result.obj",
-                  "r").read()
+    result = open("../../legoizer/build/result.obj", "r").read()
     return result
 
 
