@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <ostream>
 
 namespace tinyobj {
 
@@ -18,6 +19,10 @@ struct face_t {
   int v2;
   int v3;
   face_t(int v1, int v2, int v3);
+  friend std::ostream& operator<<(std::ostream& os, const face_t& f) {
+      os << f.v1 << '/' << f.v2 << '/' << f.v3;
+      return os;
+  }
 };
 
 typedef struct {

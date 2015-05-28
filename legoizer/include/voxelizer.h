@@ -12,6 +12,8 @@ public:
     std::shared_ptr<ObjData> Process(std::shared_ptr<ObjData> data);
 
 private:
+    void addFaces(tinyobj::face_t const & face, std::vector<glm::vec3>& v, std::vector<tinyobj::face_t>& f);
+
     float m_maxX;
     float m_maxY;
     float m_maxZ;

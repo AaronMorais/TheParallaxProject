@@ -1,7 +1,7 @@
 print-%: ; @echo $*=$($*)
 
-CC := g++
-# CC := i686-w64-mingw32-g++ # Compiler for Windows MinGW64
+# CC := g++
+CC := i686-w64-mingw32-g++ # Compiler for Windows MinGW64
 # CC := clang --analyze # and comment out the linker last line for sanity
 
 ASSETS_DIR := assets
@@ -66,11 +66,10 @@ clean:
 test: $(TEST_TARGET)
 
 run: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) $(ASSETS_DIR)/teddy.obj
+	$(PROJECT_TARGET) $(ASSETS_DIR)/teapot.obj
 
 run-tests: $(TEST_TARGET)
-	$(TEST_TARGET) $(ASSETS_DIR)/teddy.obj
-
+	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
 
 run-test-cow: $(TEST_TARGET)
 	$(TEST_TARGET) $(ASSETS_DIR)/cow.obj
@@ -82,5 +81,8 @@ run-test-teapot: $(TEST_TARGET)
 	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
 
 
+run-dos2unix:
+	dos2unix
 
 .PHONY: all clean test run run-tests
+

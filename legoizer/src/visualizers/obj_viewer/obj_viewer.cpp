@@ -363,6 +363,6 @@ ObjViewer::ObjViewer() :
 
     m_horizontalAngle = 3.14f;
     m_verticalAngle = 0.0f;
-    m_speed = 0.5f;
+    m_speed = 1.0f;
     m_mouseSpeed = 0.005f;
 }
