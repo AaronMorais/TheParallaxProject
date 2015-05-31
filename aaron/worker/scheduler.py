@@ -59,7 +59,7 @@ def run_job(obj):
 
 
 def process_jobs():
-    jobs = input_queue.get_messages(num_messages=1)
+    jobs = input_queue.get_messages(num_messages=1, wait_time_seconds=20)
 
     for job in jobs:
         job_body = job.get_body()
