@@ -53,8 +53,8 @@ def run_job(obj):
     job_file = open("job_data", "w")
     job_file.write(obj)
     job_file.close()
-    os.system("../../legoizer/build/legoizer job_data")
-    result = open("../../legoizer/build/result.obj", "r").read()
+    os.system("build/legoizer job_data")
+    result = open("build/result.obj", "r").read()
     return result
 
 
@@ -66,7 +66,10 @@ def process_jobs():
         print("Received job")
         result = run_job(job_body)
 
-        file_name = hashlib.sha1().update(result).hexdigest()
+        sha1 = hashlib.sha1()
+        sha1.update(result)
+        file_name = sha1.hexdigest()
+
         bucket_key.key = file_name
         bucket_key.set_contents_from_string(result)
 
