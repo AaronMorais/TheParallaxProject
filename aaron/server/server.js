@@ -40,7 +40,13 @@ function checkOutputMessages() {
             var message = data.Messages[0];
             body = new Buffer(message.Body, 'base64').toString();
             console.log("Result received", body)
-            io.emit('complete', body);
+            s3.getObject({Bucket: "team-parallax", Key: body}, function(err, data) {
+              if (err)
+                console.log(err, err.stack); // an error occurred
+                return
+              io.emit('complete', data);
+            });
+
             var deleteParams = {
                 QueueUrl: output_queue_url,
                 ReceiptHandle: message.ReceiptHandle
