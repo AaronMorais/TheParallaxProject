@@ -18,7 +18,7 @@ function readFile(evt) {
         r.onload = function(e) {
             var contents = e.target.result;
             loadModel(contents);
-            window.file_string = content;
+            window.file_string = contents;
         }
     }
 }
