@@ -5,7 +5,6 @@ function loadModel(model) {
         window.scene.remove(window.current_object)
     }
     window.current_object = result;
-    result.position.y = - 80;
     window.scene.add(result);
 }
 
@@ -23,8 +22,13 @@ function readFile(evt) {
     }
 }
 
-// socket.on('connect', function () {
-//     socket.on('complete', function (msg) {
-//         loadModel(msg)  ;
-//     });
-// });
+var socket = io.connect('http://52.11.148.201:3000/');
+$("#voxelize").click(function(){
+    socket.emit('job', window.current_object);
+});
+
+socket.on('connect', function () {
+    socket.on('complete', function (msg) {
+        loadModel(msg)  ;
+    });
+});
