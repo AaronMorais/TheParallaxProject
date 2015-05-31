@@ -43,6 +43,7 @@ To start a worker instance
   source venv/bin/activate
   DEBUG=1 python worker.py
 ```
+Caveat: This assumes that your are running from the 'worker' folder and that there is an executable at '../legoizer/build/legoizer'
 
 # S3
 We are using S3 to upload files.
@@ -52,5 +53,5 @@ These hashes corespond to file names in the 'team-parallax' s3 bucket.
 # SQS
 We are using SQS to pass messages.
 We have an 'input-queue' and an 'output-queue'. It is available in two regions.
-'us-west-1' is our dev region. 'us-west-1' is our production region
+'us-west-1' is our dev region. 'us-west-1' is our production region.
 

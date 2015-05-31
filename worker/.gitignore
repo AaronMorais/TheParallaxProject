@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Parallax Specific
+venv
+job_data
+
 # C extensions
 *.so
 

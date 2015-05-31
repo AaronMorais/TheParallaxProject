@@ -15,7 +15,7 @@ import boto.s3
 import hashlib
 import pytz
 
-logger = logging.basicConfig()
+logger = logging.basicConfig(level=logging.ERROR)
 jobstores = {
     "default": MemoryJobStore()
 }
@@ -32,7 +32,7 @@ scheduler = BlockingScheduler(jobstores=jobstores, executors=executors,
 
 region = "us-west-1" if os.environ['DEBUG'] else "us-east-1"
 conn = boto.sqs.connect_to_region(
-    "us-east-1",
+    region,
     aws_access_key_id="AKIAJ3TDGLWZIYCFEZTA",
     aws_secret_access_key="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")
 
@@ -55,8 +55,10 @@ def run_job(obj):
     job_file = open("job_data", "w")
     job_file.write(obj)
     job_file.close()
+    os.chdir("../legoizer/")
     os.system("build/legoizer job_data")
-    result = open("build/result.obj", "r").read()
+    os.chdir("../worker/")
+    result = open("../legoizer/build/result.obj", "r").read()
     return result
 
 
@@ -65,7 +67,7 @@ def process_jobs():
 
     for job in jobs:
         job_body = job.get_body()
-        print("Received job")
+        print("Received job", job_body)
         result = run_job(job_body)
 
         sha1 = hashlib.sha1()
@@ -76,12 +78,11 @@ def process_jobs():
         bucket_key.set_contents_from_string(result)
 
         new_message = boto.sqs.message.Message()
-        new_message.set_body(
-            json.dumps({"before": job_body, "after": file_name})
-        )
+        message_body = json.dumps({"before": job_body, "after": file_name})
+        new_message.set_body(message_body)
         output_queue.write(new_message)
 
-        print("Sent Job")
+        print("Sent Job", message_body)
 
         input_queue.delete_message(job)
 

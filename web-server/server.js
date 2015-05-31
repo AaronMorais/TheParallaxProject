@@ -42,7 +42,7 @@ function checkOutputMessages() {
                 socket.emit('complete', data.Body.toString());
                 delete pending_requests[result.before]
               } else {
-                console.log("Can't emit result", err, data)
+                console.log("Can't emit result. Requester must have disconnected.")
               }
             });
 
@@ -78,8 +78,7 @@ io.on('connection', function (socket) {
       Body: data,
       ContentType: 'text/plain'
     }, function(error, response) {
-      console.log('uploaded file[' + fileName + ']');
-      console.log(arguments);
+      console.log('Uploaded file: ' + fileName);
 
       var params = {
         MessageBody: fileName,
@@ -88,7 +87,11 @@ io.on('connection', function (socket) {
       };
       pending_requests[fileName] = socket;
       sqs.sendMessage(params, function(err, data) {
-        console.log("Job sent:", err, data)
+        if (err) {
+          console.log("Job failed to send.")
+        } else {
+          console.log("Job sent")
+        }
       });
     });
   });
