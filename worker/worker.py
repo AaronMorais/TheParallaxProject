@@ -30,7 +30,10 @@ job_defaults = {
 scheduler = BlockingScheduler(jobstores=jobstores, executors=executors,
                               timezone=pytz.utc, logger=logger)
 
-region = "us-west-1" if os.environ['DEBUG'] else "us-east-1"
+region = "us-east-1"
+if 'DEBUG' in os.environ and os.environ['DEBUG']:
+    region = "us-west-1"
+
 conn = boto.sqs.connect_to_region(
     region,
     aws_access_key_id="AKIAJ3TDGLWZIYCFEZTA",
