@@ -18,13 +18,14 @@ function readFile(evt) {
         r.onload = function(e) {
             var contents = e.target.result;
             loadModel(contents);
+            window.file_string = content;
         }
     }
 }
 
 var socket = io.connect('http://52.11.148.201:3000/');
 $("#voxelize").click(function(){
-    socket.emit('job', window.current_object);
+    socket.emit('job', window.file_string);
 });
 
 socket.on('connect', function () {
