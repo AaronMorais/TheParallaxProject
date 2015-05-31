@@ -11,7 +11,7 @@ pip install -r requirements.txt
 screen -S worker -d -m python ~/TheParallaxProject/worker/worker.py
 
 screen -X -S server quit
-kill -9 $(ps aux | grep '\snode\s' | awk '{print $2}')
+sudo kill -9 $(ps aux | grep '\snode\s' | awk '{print $2}')
 cd ../web-server
 npm install
 cd ~/
