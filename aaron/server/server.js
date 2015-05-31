@@ -44,7 +44,7 @@ function checkOutputMessages() {
               if (err)
                 console.log(err, err.stack); // an error occurred
                 return
-              io.emit('complete', data);
+              io.emit('complete', data.Body.toString());
             });
 
             var deleteParams = {
