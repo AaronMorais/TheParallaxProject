@@ -351,7 +351,11 @@ THREE.OBJLoader.prototype = {
 				buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
 			}
 
-			var material = new THREE.MeshLambertMaterial();
+			var material = new THREE.MeshLambertMaterial( {
+				color: 0xFF0000,
+				side: THREE.DoubleSide
+			});
+
 			material.name = object.material.name;
 
 			var mesh = new THREE.Mesh( buffergeometry, material );
