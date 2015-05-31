@@ -3,76 +3,14 @@
     <head>
         <title>Parallax</title>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="js/external/three.min.js"></script>
+        <script src="js/external/OBJLoader.js"></script>
         <script src="/socket.io/socket.io.js"></script>
     </head>
 
     <body>
-        <div class="input">
-            <h1>Please upload an obj file</h1>
-            <input type="file" id="fileinput" size="50"></input>
-            <button id="upload-button" type="button">Upload Obj</button>
-            <div id="input-container"></div>
-        </div>
-        <div class="process">
-            <h1>Processing</h1>
-        </div>
-        <div class="result">
-            <h1>Result</h1>
-            <div id="comparison" style="display: flex;">
-                <div id="old-container" style="padding-right: 20px;"></div>
-                <div id="result-container"></div>
-            </div>
-        </div>
+        <input type="file" id="fileinput" size="50"></input>
     </body>
-
-    <script>
-        var socket = io.connect('http://52.11.148.201:3000/');
-
-        window.obj_data = "";
-        $("#upload-button").hide();
-        $(".process").hide();
-        $(".result").hide();
-
-        document.getElementById('fileinput').addEventListener('change', readFile, false);
-        function readFile(evt) {
-            var f = evt.target.files[0];
-
-            if (f) {
-                var r = new FileReader();
-                r.readAsText(f);
-                r.onload = function(e) {
-                    var contents = e.target.result;
-                    window.obj_data = contents;
-
-                    str = contents
-                    str = str.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                    $("#input-container").html(str)
-
-                    $("#upload-button").show();
-                }
-            }
-        }
-        $("#upload-button").click(function(){
-            socket.emit('job', window.obj_data);
-            $(".input").hide();
-            $(".process").show();
-        });
-
-        socket.on('connect', function () {
-            socket.on('complete', function (msg) {
-                $(".process").hide();
-                $(".result").show();
-
-                old_str = window.obj_data;
-                old_str = old_str.replace(/(?:\r\n|\r|\n)/g, '<br />');
-
-                str = msg;
-                str = str.replace(/(?:\r\n|\r|\n)/g, '<br />');
-
-                $("#old-container").html(old_str);
-                $("#result-container").html(str)
-            });
-        });
-
-    </script>
+    <script src="js/render.js"></script>
+    <script src="js/process.js"></script>
 </html>
