@@ -26,7 +26,7 @@ main(
 
   std::shared_ptr<ObjData> vData = voxelizer->Process(data);
 
-  ObjPrint::PrintFromDataToFile(vData, "build/result.obj");
+  ObjPrint::PrintFromDataToFile(vData, "./build/result.obj");
 
   std::cout << "Completed" << std::endl;
 
