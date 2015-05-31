@@ -3,6 +3,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var AWS = require('aws-sdk');
+var crypto = require('crypto')
 
 var sqs = new AWS.SQS({
     apiVersion: '2012-11-05',
@@ -54,13 +55,29 @@ app.get('/', function(req,res){
 io.on('connection', function (socket) {
   socket.on('job', function (data) {
     console.log("Job request received");
-    var params = {
-      MessageBody: JSON.stringify(data),
-      QueueUrl: input_queue_url,
-      DelaySeconds: 0
-    };
-    sqs.sendMessage(params, function(err, data) {
-        console.log("Job sent:", err, data)
+
+    shasum = crypto.createHash('sha1');
+    shasum.update(data);
+    fileName = shasum.digest('hex')
+
+    s3.putObject({
+      ACL: 'public-read',
+      Bucket: 'team-parallax',
+      Key: fileName,
+      Body: data,
+      ContentType: 'text/plain'
+    }, function(error, response) {
+      console.log('uploaded file[' + fileName + ']');
+      console.log(arguments);
+
+      var params = {
+        MessageBody: fileName,
+        QueueUrl: input_queue_url,
+        DelaySeconds: 0
+      };
+      sqs.sendMessage(params, function(err, data) {
+          console.log("Job sent:", err, data)
+      });
     });
   });
 });
