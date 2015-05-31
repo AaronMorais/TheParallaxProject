@@ -5,7 +5,11 @@ var io = require('socket.io')(server);
 var AWS = require('aws-sdk');
 var crypto = require('crypto')
 
-var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+var s3 = new AWS.S3({
+    apiVersion: '2006-03-01',
+    accessKeyId: 'AKIAJ3TDGLWZIYCFEZTA',
+    secretAccessKey: '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',
+});
 
 var sqs = new AWS.SQS({
     apiVersion: '2012-11-05',
