@@ -6,6 +6,7 @@ function loadModel(model) {
     }
     window.current_object = result;
     window.scene.add(result);
+
 }
 
 document.getElementById('fileinput').addEventListener('change', readFile, false);

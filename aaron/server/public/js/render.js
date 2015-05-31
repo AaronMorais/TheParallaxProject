@@ -1,6 +1,4 @@
-var container;
-
-var camera, renderer, controls;
+var camera, renderer, controls, container;
 
 var mouseX = 0, mouseY = 0;
 

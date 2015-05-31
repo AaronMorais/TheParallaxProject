@@ -343,6 +343,8 @@ THREE.OBJLoader.prototype = {
 
 			if ( geometry.normals.length > 0 ) {
 				buffergeometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geometry.normals ), 3 ) );
+			} else {
+				buffergeometry.computeVertexNormals();
 			}
 
 			if ( geometry.uvs.length > 0 ) {

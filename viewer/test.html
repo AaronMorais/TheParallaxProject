@@ -39,7 +39,7 @@
 
 			var container;
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer, controls, pointLight;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -67,10 +67,13 @@
 				var ambient = new THREE.AmbientLight( 0x101030 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				scene.add( directionalLight );
+				// var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				// directionalLight.position.set( 0, 0, 1 );
+				// scene.add( directionalLight );
 
+
+				pointLight = new THREE.PointLight(0xffffff, 0.6);
+				scene.add(pointLight);
 				// texture
 
 				var manager = new THREE.LoadingManager();
@@ -96,11 +99,11 @@
 				// model
 
 				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'js/test.obj', function ( object ) {
+				loader.load( 'js/teapot.obj', function ( object ) {
 
 
 
-					object.position.y = - 80;
+					// object.position.y = -80;
 					scene.add( object );
 
 				}, onProgress, onError );
@@ -150,7 +153,10 @@
 
 			function render() {
 
-
+				var timer = Date.now() * 0.0005;
+				pointLight.position.x = Math.sin( timer * 4 ) * 3000;
+				pointLight.position.y = 600
+				pointLight.position.z = Math.cos( timer * 4 ) * 3000;
 				// camera.position.x += ( mouseX - camera.position.x ) * .05;
 				// camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
