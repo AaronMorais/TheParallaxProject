@@ -55,7 +55,7 @@ def run_job(obj):
     bucket_key.key = obj
     obj = bucket_key.get_contents_as_string()
 
-    job_file = open("job_data", "w")
+    job_file = open("../legoizer/job_data", "w")
     job_file.write(obj)
     job_file.close()
     os.chdir("../legoizer/")
