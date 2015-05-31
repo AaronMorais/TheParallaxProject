@@ -5,7 +5,7 @@ var io = require('socket.io')(server);
 var AWS = require('aws-sdk');
 var crypto = require('crypto')
 
-var region = process.env.debug ? "us-west-1" : "us-east-1"
+var region = process.env.DEBUG ? "us-west-1" : "us-east-1"
 
 input_queue_url = "https://sqs." + region + ".amazonaws.com/581926697193/input-queue";
 output_queue_url = "https://sqs." + region + ".amazonaws.com/581926697193/output-queue";
