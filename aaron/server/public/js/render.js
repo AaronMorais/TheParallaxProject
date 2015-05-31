@@ -1,6 +1,6 @@
 var container;
 
-var camera, renderer;
+var camera, renderer, controls;
 
 var mouseX = 0, mouseY = 0;
 
@@ -17,7 +17,7 @@ function init() {
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
     camera.position.z = 100;
 
-    // scene
+    controls = new THREE.OrbitControls( camera );
 
     window.scene = new THREE.Scene();
 
@@ -28,11 +28,9 @@ function init() {
     directionalLight.position.set( 0, 0, 1 );
     window.scene.add( directionalLight );
 
-    // texture
-
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
-    // renderer.setSize( window.innerWidth, window.innerHeight);
+    renderer.setSize( window.innerWidth, window.innerHeight);
     container.appendChild( renderer.domElement );
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -57,15 +55,10 @@ function onDocumentMouseMove(event) {
 }
 
 function animate() {
-    requestAnimationFrame( animate );
+    requestAnimationFrame(animate);
     render();
 }
 
 function render() {
-    camera.position.x += ( mouseX - camera.position.x ) * .05;
-    camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-    camera.lookAt( window.scene.position );
-
     renderer.render( window.scene, camera );
 }
