@@ -2,6 +2,7 @@
 Scheduled/recurring tasks.
 """
 from __future__ import absolute_import, print_function, unicode_literals
+import json
 import logging
 import os
 
@@ -74,7 +75,9 @@ def process_jobs():
         bucket_key.set_contents_from_string(result)
 
         new_message = boto.sqs.message.Message()
-        new_message.set_body(file_name)
+        new_message.set_body(
+            json.dumps({"before": job_body, "after": file_name})
+        )
         output_queue.write(new_message)
 
         print("Sent Job")

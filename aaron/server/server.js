@@ -30,6 +30,8 @@ var sqs = new AWS.SQS({
 input_queue_url = "https://sqs.us-east-1.amazonaws.com/581926697193/input-queue";
 output_queue_url = "https://sqs.us-east-1.amazonaws.com/581926697193/output-queue";
 
+var pending_requests = {}
+
 function checkOutputMessages() {
     var params = {
       QueueUrl: output_queue_url,
@@ -40,11 +42,13 @@ function checkOutputMessages() {
             var message = data.Messages[0];
             body = new Buffer(message.Body, 'base64').toString();
             console.log("Result received", body)
-            s3.getObject({Bucket: "team-parallax", Key: body}, function(err, data) {
+            result = JSON.parse(body)
+            s3.getObject({Bucket: "team-parallax", Key: result.after}, function(err, data) {
               if (err)
                 console.log(err, err.stack); // an error occurred
                 return
-              io.emit('complete', data.Body.toString());
+              pending_requests[result.before].emit('complete', data.Body.toString());
+              delete pending_requests[result.before]
             });
 
             var deleteParams = {
@@ -87,8 +91,9 @@ io.on('connection', function (socket) {
         QueueUrl: input_queue_url,
         DelaySeconds: 0
       };
+      pending_requests[fileName] = socket;
       sqs.sendMessage(params, function(err, data) {
-          console.log("Job sent:", err, data)
+        console.log("Job sent:", err, data)
       });
     });
   });
