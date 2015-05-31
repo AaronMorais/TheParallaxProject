@@ -2,7 +2,6 @@
 Scheduled/recurring tasks.
 """
 from __future__ import absolute_import, print_function, unicode_literals
-import json
 import logging
 import os
 
@@ -42,9 +41,8 @@ def run_job(obj):
     job_file = open("job_data", "w")
     job_file.write(obj)
     job_file.close()
-    # os.system("../../legoizer/build/legoizer job_data")
+    os.system("../../legoizer/build/legoizer job_data")
     result = open("../../legoizer/build/result.obj", "r").read()
-    result = (result[:1000] + '...') if len(result) > 1000 else result
     return result
 
 
@@ -52,17 +50,17 @@ def process_jobs():
     jobs = input_queue.get_messages(num_messages=1)
 
     for job in jobs:
-	    job_body = job.get_body()
-	    print("Received job")
-	    result = run_job(job_body)
+        job_body = job.get_body()
+        print("Received job")
+        result = run_job(job_body)
 
-	    new_message = boto.sqs.message.Message()
-	    new_message.set_body(result)
-	    output_queue.write(new_message)
+        new_message = boto.sqs.message.Message()
+        new_message.set_body(result)
+        output_queue.write(new_message)
 
-	    print("Sent Job")
+        print("Sent Job")
 
-	    input_queue.delete_message(job)
+        input_queue.delete_message(job)
 
 
 scheduler.add_job(process_jobs, "interval", seconds=1)
