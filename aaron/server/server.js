@@ -44,9 +44,6 @@ function checkOutputMessages() {
             console.log("Result received", body)
             result = JSON.parse(body)
             s3.getObject({Bucket: "team-parallax", Key: result.after}, function(err, data) {
-              if (err)
-                console.log(err, err.stack); // an error occurred
-                return
               pending_requests[result.before].emit('complete', data.Body.toString());
               delete pending_requests[result.before]
             });
