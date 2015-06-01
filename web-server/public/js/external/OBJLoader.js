@@ -352,7 +352,7 @@ THREE.OBJLoader.prototype = {
 			}
 
 			var material = new THREE.MeshLambertMaterial( {
-				color: 0xFF0000,
+				color: 0xFFFFFF,
 				side: THREE.DoubleSide
 			});
 

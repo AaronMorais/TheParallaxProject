@@ -2,4 +2,5 @@
 *.sublime-workspace
 Thumbs.db
 .DS_STORE
+node_modules
 
