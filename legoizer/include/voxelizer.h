@@ -13,7 +13,9 @@ public:
 
 private:
     void addFaces(tinyobj::face_t const & face, std::vector<glm::vec3>& v, std::vector<tinyobj::face_t>& f);
-
+    void setMinMaxXYZ(std::vector<tinyobj::face_t>& faces, std::vector<glm::vec3>& vertices);
+    void voxelizeFace(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+    void voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std::vector<tinyobj::face_t>& faces, std::vector<glm::vec3>& vertices);
     float m_maxX;
     float m_maxY;
     float m_maxZ;
