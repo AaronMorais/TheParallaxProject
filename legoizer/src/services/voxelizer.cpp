@@ -49,9 +49,22 @@ void Voxelizer::setMinMaxXYZ(std::vector<tinyobj::face_t>& faces, std::vector<gl
     }
 }
 
-
-glm::vec3 Voxelizer::midPoint(glm::vec3& v1, glm::vec3& v2) {
+glm::vec3 Voxelizer::midPoint(glm::vec3& v1, glm::vec3& v2)
+{
     return glm::vec3((v1.x + v2.x) / 2, (v1.y + v2.y) / 2, (v1.z + v2.z) / 2);
+}
+
+bool Voxelizer::samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+{
+    return  std::abs((int)v1.x - (int)v2.x) < 2 &&
+            std::abs((int)v2.x - (int)v3.x) < 2 &&
+            std::abs((int)v1.y - (int)v2.y) < 2 &&
+            std::abs((int)v2.y - (int)v3.y) < 2 &&
+            std::abs((int)v1.z - (int)v2.z) < 2 &&
+            std::abs((int)v2.z - (int)v3.z) < 2 &&
+            grid[(int)v1.x][(int)v1.y][(int)v1.z] == 1 &&
+            grid[(int)v2.x][(int)v2.y][(int)v2.z] == 1 &&
+            grid[(int)v3.x][(int)v3.y][(int)v3.z] == 1;
 }
 
 
@@ -64,9 +77,7 @@ void Voxelizer::voxelizeFace(
     glm::vec3 p2 = glm::vec3((v2.x - m_minX) / m_unit, (v2.y - m_minY) / m_unit, (v2.z - m_minZ) / m_unit);
     glm::vec3 p3 = glm::vec3((v3.x - m_minX) / m_unit, (v3.y - m_minY) / m_unit, (v3.z - m_minZ) / m_unit);
 
-    if (grid[(int)p1.x][(int)p1.y][(int)p1.z] == 1 &&
-        grid[(int)p2.x][(int)p2.y][(int)p2.z] == 1 &&
-        grid[(int)p3.x][(int)p3.y][(int)p3.z] == 1){
+    if (samePointAndOccupied(grid, p1, p2, p3)){
         return;
     }
 
