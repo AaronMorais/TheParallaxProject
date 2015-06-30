@@ -14,11 +14,16 @@ public:
 private:
     const float LEGO_SCALE = 1.230769; // height to width ratio (height: 9.6mm / width,depth: 7.8mm)
 
+    struct Vertex {
+        float x, y, z;
+        Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
+    };
+
     void setMinMaxXYZ(std::vector<tinyobj::face_t>& faces, std::vector<glm::vec3>& vertices);
-    void voxelizeFace(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+    void voxelizeFace(std::vector<std::vector<std::vector<int>>>& grid, Vertex& v1, Vertex& v2, Vertex& v3);
     void voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std::vector<tinyobj::face_t>& faces, std::vector<glm::vec3>& vertices);
-    glm::vec3 midPoint(glm::vec3& v1, glm::vec3& v2);
-    bool samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+    Vertex midPoint(Vertex& v1, Vertex& v2);
+    bool samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, Vertex& v1, Vertex& v2, Vertex& v3);
     void fillShell(std::vector<std::vector<std::vector<int>>>& grid);
 
     float m_maxX;

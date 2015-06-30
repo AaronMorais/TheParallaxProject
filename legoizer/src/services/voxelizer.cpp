@@ -51,12 +51,12 @@ void Voxelizer::setMinMaxXYZ(std::vector<tinyobj::face_t>& faces, std::vector<gl
     }
 }
 
-glm::vec3 Voxelizer::midPoint(glm::vec3& v1, glm::vec3& v2)
+Voxelizer::Vertex Voxelizer::midPoint(Vertex& v1, Vertex& v2)
 {
-    return glm::vec3((v1.x + v2.x) / 2, (v1.y + v2.y) / 2, (v1.z + v2.z) / 2);
+    return Vertex((v1.x + v2.x) / 2, (v1.y + v2.y) / 2, (v1.z + v2.z) / 2);
 }
 
-bool Voxelizer::samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+bool Voxelizer::samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, Vertex& v1, Vertex& v2, Vertex& v3)
 {
     return  std::abs((int)v1.x - (int)v2.x) < 2 &&
             std::abs((int)v2.x - (int)v3.x) < 2 &&
@@ -72,12 +72,12 @@ bool Voxelizer::samePointAndOccupied(std::vector<std::vector<std::vector<int>>>&
 
 void Voxelizer::voxelizeFace(
     std::vector<std::vector<std::vector<int>>>& grid,
-    glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+    Vertex& v1, Vertex& v2, Vertex& v3)
 {
     // scale model to NxNxN grid
-    glm::vec3 p1 = glm::vec3((v1.x - m_minX) / m_unit, (v1.y - m_minY) / (m_unit * LEGO_SCALE), (v1.z - m_minZ) / m_unit);
-    glm::vec3 p2 = glm::vec3((v2.x - m_minX) / m_unit, (v2.y - m_minY) / (m_unit * LEGO_SCALE), (v2.z - m_minZ) / m_unit);
-    glm::vec3 p3 = glm::vec3((v3.x - m_minX) / m_unit, (v3.y - m_minY) / (m_unit * LEGO_SCALE), (v3.z - m_minZ) / m_unit);
+    Vertex p1 = Vertex((v1.x - m_minX) / m_unit, (v1.y - m_minY) / (m_unit * LEGO_SCALE), (v1.z - m_minZ) / m_unit);
+    Vertex p2 = Vertex((v2.x - m_minX) / m_unit, (v2.y - m_minY) / (m_unit * LEGO_SCALE), (v2.z - m_minZ) / m_unit);
+    Vertex p3 = Vertex((v3.x - m_minX) / m_unit, (v3.y - m_minY) / (m_unit * LEGO_SCALE), (v3.z - m_minZ) / m_unit);
 
     if (samePointAndOccupied(grid, p1, p2, p3)){
         return;
@@ -87,9 +87,9 @@ void Voxelizer::voxelizeFace(
     grid[(int)p2.x][(int)p2.y][(int)p2.z] = 1;
     grid[(int)p3.x][(int)p3.y][(int)p3.z] = 1;
 
-    glm::vec3 mid1 = midPoint(v1, v2);
-    glm::vec3 mid2 = midPoint(v2, v3);
-    glm::vec3 mid3 = midPoint(v1, v3);
+    Vertex mid1 = midPoint(v1, v2);
+    Vertex mid2 = midPoint(v2, v3);
+    Vertex mid3 = midPoint(v1, v3);
 
     voxelizeFace(grid, v1, mid1, mid3);
     voxelizeFace(grid, mid1, v2, mid2);
@@ -131,9 +131,9 @@ Voxelizer::Process(
         std::cout << "Voxelizing shell" << std::endl;
         for (std::vector<tinyobj::face_t>::const_iterator face = faces.begin(); face != faces.end(); ++face )
         {
-            glm::vec3& v1 = vertices[face->v1];
-            glm::vec3& v2 = vertices[face->v2];
-            glm::vec3& v3 = vertices[face->v3];
+            Vertex v1 = Vertex(vertices[face->v1].x, vertices[face->v1].y, vertices[face->v1].z);
+            Vertex v2 = Vertex(vertices[face->v2].x, vertices[face->v2].y, vertices[face->v2].z);
+            Vertex v3 = Vertex(vertices[face->v3].x, vertices[face->v3].y, vertices[face->v3].z);
             voxelizeFace(grid, v1, v2, v3);
         }
 
