@@ -5,6 +5,8 @@
 #include <iostream>
 #include <algorithm>
 
+const bool FILL_SHELL = false;
+
 Voxelizer::Voxelizer() :
     m_maxX(INT_MIN),
     m_maxY(INT_MIN),
@@ -124,8 +126,7 @@ Voxelizer::Process(
         std::vector<std::vector<std::vector<int>>> grid =
             std::vector<std::vector<std::vector<int>>>(m_width,
             std::vector<std::vector<int>>(m_height,
-            std::vector<int>(m_depth, 0)));
-
+            std::vector<int>(m_depth, FILL_SHELL ? -1 : 0)));
 
         size_t end = faces.size();
         std::cout << "fsize: " << end << std::endl;
@@ -141,6 +142,9 @@ Voxelizer::Process(
             glm::vec3& v3 = vertices[face->v3];
             voxelizeFace(grid, v1, v2, v3);
         }
+
+        if(FILL_SHELL)
+            fillShell(grid);
 
         vertices.clear();
         faces.clear();
@@ -224,4 +228,109 @@ void Voxelizer::addFaces(tinyobj::face_t const & face, std::vector<glm::vec3>& v
     addFaces(f2, v, f);
     addFaces(f3, v, f);
     addFaces(f4, v, f);
+}
+
+void Voxelizer::fillShell(std::vector<std::vector<std::vector<int>>>& grid)
+{
+    std::cout<<"Filling Shell"<<std::endl;
+    //x direction
+    std::cout<<"Chipping x axis"<<std::endl;
+    for (size_t i = 0; i < grid.size(); ++i)
+    {
+        for (size_t j = 0; j < grid[i].size(); ++j)
+        {
+            size_t min = 0;
+            bool minFound = false;
+            for (size_t k = 0; k < grid[i][j].size() && !minFound; ++k)
+            {
+                if (grid[i][j][k] == 1) {
+                    if (!minFound)
+                        min = k;
+                        minFound = true;
+                } else {
+                    grid[i][j][k] = 0;
+                }
+            }
+            if (minFound) {
+                minFound = false;
+                for (size_t k = grid[i][j].size() - 1; k > min && !minFound; --k)
+                {
+                    if (grid[i][j][k] == 1) {
+                        if (!minFound)
+                            minFound = true;
+                    } else {
+                        grid[i][j][k] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    //y direction
+    std::cout<<"Chipping y axis"<<std::endl;
+    for (size_t i = 0; i < grid.size(); ++i)
+    {
+        for (size_t k = 0; k < grid[i][0].size(); ++k)
+        {
+            size_t min = 0;
+            bool minFound = false;
+            for (size_t j = 0; j < grid[i].size() && !minFound; ++j)
+            {
+                if (grid[i][j][k] == 1) {
+                    if (!minFound)
+                        min = j;
+                        minFound = true;
+                } else {
+                    grid[i][j][k] = 0;
+                }
+            }
+            if (minFound) {
+                minFound = false;
+                for (size_t j = grid[i].size() - 1; j > min && !minFound; --j)
+                {
+                    if (grid[i][j][k] == 1) {
+                        if (!minFound)
+                            minFound = true;
+                    } else {
+                        grid[i][j][k] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    //z direction
+    std::cout<<"Chipping z axis"<<std::endl;
+    for (size_t j = 0; j < grid[0].size(); ++j)
+    {
+        for (size_t i = 0; i < grid.size(); ++i)
+        {
+            size_t min = 0;
+            bool minFound = false;
+            for (size_t k = 0; k < grid[i][j].size() && !minFound; ++k)
+            {
+                if (grid[i][j][k] == 1) {
+                    if (!minFound)
+                        min = k;
+                        minFound = true;
+                } else {
+                    grid[i][j][k] = 0;
+                }
+            }
+            if (minFound) {
+                minFound = false;
+                for (size_t k = grid[i][j].size() - 1; k > min && !minFound; --k)
+                {
+                    if (grid[i][j][k] == 1) {
+                        if (!minFound)
+                            minFound = true;
+                    } else {
+                        grid[i][j][k] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    std::cout<<"Shell Filled"<<std::endl;
 }
