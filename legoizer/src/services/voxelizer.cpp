@@ -75,9 +75,9 @@ void Voxelizer::voxelizeFace(
     glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 {
     // scale model to NxNxN grid
-    glm::vec3 p1 = glm::vec3((v1.x - m_minX) / m_unit, (v1.y - m_minY) / m_unit, (v1.z - m_minZ) / m_unit);
-    glm::vec3 p2 = glm::vec3((v2.x - m_minX) / m_unit, (v2.y - m_minY) / m_unit, (v2.z - m_minZ) / m_unit);
-    glm::vec3 p3 = glm::vec3((v3.x - m_minX) / m_unit, (v3.y - m_minY) / m_unit, (v3.z - m_minZ) / m_unit);
+    glm::vec3 p1 = glm::vec3((v1.x - m_minX) / m_unit, (v1.y - m_minY) / (m_unit * LEGO_SCALE), (v1.z - m_minZ) / m_unit);
+    glm::vec3 p2 = glm::vec3((v2.x - m_minX) / m_unit, (v2.y - m_minY) / (m_unit * LEGO_SCALE), (v2.z - m_minZ) / m_unit);
+    glm::vec3 p3 = glm::vec3((v3.x - m_minX) / m_unit, (v3.y - m_minY) / (m_unit * LEGO_SCALE), (v3.z - m_minZ) / m_unit);
 
     if (samePointAndOccupied(grid, p1, p2, p3)){
         return;
@@ -117,7 +117,7 @@ Voxelizer::Process(
         m_unit = s / m_subdivisions;
 
         m_width = std::ceil((m_maxX - m_minX) / m_unit) + 1;
-        m_height = std::ceil((m_maxY - m_minY) / m_unit) + 1;
+        m_height = std::ceil((m_maxY - m_minY) / (m_unit * LEGO_SCALE)) + 1;
         m_depth = std::ceil((m_maxZ - m_minZ) / m_unit) + 1;
 
         std::cout << "unit: " << m_unit << std::endl;
@@ -128,13 +128,7 @@ Voxelizer::Process(
             std::vector<std::vector<int>>(m_height,
             std::vector<int>(m_depth, FILL_SHELL ? -1 : 0)));
 
-        size_t end = faces.size();
-        std::cout << "fsize: " << end << std::endl;
-        for (size_t i = 0; i < end; ++i)
-        {
-            addFaces(faces[i], vertices, faces);
-        }
-
+        std::cout << "Voxelizing shell" << std::endl;
         for (std::vector<tinyobj::face_t>::const_iterator face = faces.begin(); face != faces.end(); ++face )
         {
             glm::vec3& v1 = vertices[face->v1];
@@ -170,14 +164,14 @@ void Voxelizer::voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std
                 if (grid[i][j][k] != 0)
                 {
                     size_t last = vertices.size();
-                    vertices.push_back(glm::vec3(i+0.0f+0.001f,j+0.0f+0.001f,k+0.0f+0.001f)); // 0
-                    vertices.push_back(glm::vec3(i+1.0f+0.001f,j+0.0f+0.001f,k+0.0f+0.001f)); // 1
-                    vertices.push_back(glm::vec3(i+0.0f+0.001f,j+1.0f+0.001f,k+0.0f+0.001f)); // 2
-                    vertices.push_back(glm::vec3(i+0.0f+0.001f,j+0.0f+0.001f,k+1.0f+0.001f)); // 3
-                    vertices.push_back(glm::vec3(i+1.0f+0.001f,j+1.0f+0.001f,k+0.0f+0.001f)); // 4
-                    vertices.push_back(glm::vec3(i+0.0f+0.001f,j+1.0f+0.001f,k+1.0f+0.001f)); // 5
-                    vertices.push_back(glm::vec3(i+1.0f+0.001f,j+0.0f+0.001f,k+1.0f+0.001f)); // 6
-                    vertices.push_back(glm::vec3(i+1.0f+0.001f,j+1.0f+0.001f,k+1.0f+0.001f)); // 7
+                    vertices.push_back(glm::vec3(i+0.0f+0.001f,(j*LEGO_SCALE)+0.0f+0.001f,k+0.0f+0.001f)); // 0
+                    vertices.push_back(glm::vec3(i+1.0f+0.001f,(j*LEGO_SCALE)+0.0f+0.001f,k+0.0f+0.001f)); // 1
+                    vertices.push_back(glm::vec3(i+0.0f+0.001f,(j*LEGO_SCALE)+LEGO_SCALE+0.001f,k+0.0f+0.001f)); // 2
+                    vertices.push_back(glm::vec3(i+0.0f+0.001f,(j*LEGO_SCALE)+0.0f+0.001f,k+1.0f+0.001f)); // 3
+                    vertices.push_back(glm::vec3(i+1.0f+0.001f,(j*LEGO_SCALE)+LEGO_SCALE+0.001f,k+0.0f+0.001f)); // 4
+                    vertices.push_back(glm::vec3(i+0.0f+0.001f,(j*LEGO_SCALE)+LEGO_SCALE+0.001f,k+1.0f+0.001f)); // 5
+                    vertices.push_back(glm::vec3(i+1.0f+0.001f,(j*LEGO_SCALE)+0.0f+0.001f,k+1.0f+0.001f)); // 6
+                    vertices.push_back(glm::vec3(i+1.0f+0.001f,(j*LEGO_SCALE)+LEGO_SCALE+0.001f,k+1.0f+0.001f)); // 7
 
                     faces.push_back(tinyobj::face_t(last+1, last+2, last+0));
                     faces.push_back(tinyobj::face_t(last+2, last+4, last+1));
@@ -200,34 +194,6 @@ void Voxelizer::voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std
             }
         }
     }
-}
-
-void Voxelizer::addFaces(tinyobj::face_t const & face, std::vector<glm::vec3>& v, std::vector<tinyobj::face_t>& f) {
-
-    glm::vec3& v1 = v[face.v1];
-    glm::vec3& v2 = v[face.v2];
-    glm::vec3& v3 = v[face.v3];
-
-    if (glm::distance(v1, v2) < m_unit ||
-        glm::distance(v2, v3) < m_unit ||
-        glm::distance(v3, v1) < m_unit) {
-        return;
-    }
-
-    size_t last = v.size();
-    v.push_back(glm::vec3((v1.x + v2.x) / 2.0f, (v1.y + v2.y) / 2.0f, (v1.z + v2.z) / 2.0f));
-    v.push_back(glm::vec3((v2.x + v3.x) / 2.0f, (v2.y + v3.y) / 2.0f, (v2.z + v3.z) / 2.0f));
-    v.push_back(glm::vec3((v3.x + v1.x) / 2.0f, (v3.y + v1.y) / 2.0f, (v3.z + v1.z) / 2.0f));
-    f.push_back(tinyobj::face_t(last, last+1, last+2));
-
-    tinyobj::face_t f1(face.v1, last+0, last+2);
-    tinyobj::face_t f2(face.v2, last+0, last+1);
-    tinyobj::face_t f3(face.v3, last+2, last+1);
-    tinyobj::face_t f4(last+0, last+1, last+2);
-    addFaces(f1, v, f);
-    addFaces(f2, v, f);
-    addFaces(f3, v, f);
-    addFaces(f4, v, f);
 }
 
 void Voxelizer::fillShell(std::vector<std::vector<std::vector<int>>>& grid)
