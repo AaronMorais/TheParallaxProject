@@ -15,7 +15,7 @@ TEST_TARGET := $(BUILD_DIR)/tester
 PROJECT_MAIN_OBJECT := $(BUILD_DIR)/main.o
 TEST_MAIN_OBJECT := $(BUILD_DIR)/tester.o
 GLFW_OBJECTS := \
-	$(BUILD_DIR)/visualizers/obj_viewer/obj_viewer.o \
+	$(BUILD_DIR)/visualizers/obj_viewer.o \
 
 SRC_EXT := cpp
 SOURCES := $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
@@ -40,6 +40,7 @@ TEST_LIB := \
 	-l glu32 \
 
 INC := \
+	-I src \
 	-I include \
 
 TEST_INC := \

@@ -1,6 +1,6 @@
-#include "obj_printer.h"
+#include "visualizers/obj_printer.h"
 #include "obj_data.h"
-#include "voxelizer.h"
+#include "services/voxelizer.h"
 
 #include <iostream>
 
