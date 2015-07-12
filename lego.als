@@ -12,13 +12,13 @@ pred connected[b1, b2 : one Brick] {
 	some v1 : b1.voxels |
 			some v2 : b2.voxels | aboveOrBelow[v1, v2]
 }
-sig OneOne, OneTwo, OneThree, OneFour, TwoTwo extends Brick {}
+sig OneOne, OneTwo, OneThree, OneFour, TwoTwo, L extends Brick {}
 fun length[] : Brick -> Int {
-	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->2}
+	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->2 + L->2}
 fun width[] : Brick -> Int {
-	OneOne->1 + OneTwo->1 + OneThree->1 + OneFour->1 + TwoTwo->2}
+	OneOne->1 + OneTwo->1 + OneThree->1 + OneFour->1 + TwoTwo->2 + L->2}
 fun volume[] : Brick -> Int {
-	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->4}
+	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->4 + L->3}
 
 abstract sig Voxel {}
 one sig A, B, C, D, E, F, G, H extends Voxel {}
@@ -72,10 +72,10 @@ fact WellPlaced {
 	all b : Brick | b.*connected = Brick
 	-- Bricks are only as long and wide as the brick type allows
 	all b : Brick | all v : b.voxels |
-		 (#(v.*(b.voxels <: xAdjacent :> b.voxels)) = b.length and
-			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) = b.width) or
- 		(#(v.*(b.voxels <: xAdjacent :> b.voxels)) = b.width and
-			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) = b.length)
+		 (#(v.*(b.voxels <: xAdjacent :> b.voxels)) <= b.length and
+			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) <= b.width) or
+ 		(#(v.*(b.voxels <: xAdjacent :> b.voxels)) <= b.width and
+			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) <= b.length)
 }
 pred build {}
 run build for 6 but 6 Int
