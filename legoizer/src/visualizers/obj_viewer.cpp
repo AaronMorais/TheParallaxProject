@@ -321,7 +321,6 @@ ObjViewer::Render()
         {
             glBegin(GL_TRIANGLES);
 
-            float randomfucker = f * rand() / RAND_MAX;
             glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
             glVertex3f(
                 mesh.vertices[mesh.faces[f].v1].x,

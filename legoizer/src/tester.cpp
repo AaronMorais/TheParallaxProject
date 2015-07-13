@@ -7,32 +7,31 @@
 
 int
 main(
-  int argc,
-  char** argv
-)
+    int argc,
+    char** argv
+    )
 {
-  std::shared_ptr<ObjData> data;
-  if (argc > 1) {
-    const char* basepath = NULL;
-    if (argc > 2) {
-      basepath = argv[2];
+    std::shared_ptr<ObjData> data;
+    if (argc > 1) {
+        const char* basepath = NULL;
+        if (argc > 2) {
+            basepath = argv[2];
+        }
+
+        data = ObjData::CreateDataFromFile(argv[1], basepath);
+    } else {
+        return 1;
     }
 
-    data = ObjData::CreateDataFromFile(argv[1], basepath);
-  } else {
-    return 1;
-  }
+    std::shared_ptr<Voxelizer> voxelizer = std::make_shared<Voxelizer>();
 
-  std::shared_ptr<Voxelizer> voxelizer = std::make_shared<Voxelizer>();
+    auto vData = voxelizer->Process(data);
 
-  auto vData = voxelizer->Process(data);
+    ObjViewer::GetInstance().SetData(vData);
 
-  ObjViewer::GetInstance().SetData(vData);
+    ObjViewer::GetInstance().Run();
 
-  ObjViewer::GetInstance().Run();
+    std::cout << "Test Completed" << std::endl;
 
-
-  std::cout << "Test Completed" << std::endl;
-
-  return 0;
+    return 0;
 }

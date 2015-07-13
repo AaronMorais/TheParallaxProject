@@ -1,5 +1,4 @@
 #include "voxelizer.h"
-#include "tiny_obj_loader.h"
 
 #include <math.h>
 #include <iostream>
@@ -17,13 +16,13 @@ Voxelizer::Voxelizer() :
 {
 }
 
-void Voxelizer::setMinMaxXYZ(std::vector<tinyobj::face_t>& faces, std::vector<glm::vec3>& vertices)
+void Voxelizer::setMinMaxXYZ(std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices)
 {
-    for (std::vector<tinyobj::face_t>::iterator face = faces.begin(); face != faces.end(); ++face )
+    for (std::vector<glm::vec3>::iterator face = faces.begin(); face != faces.end(); ++face )
     {
-        auto v1 = vertices[(*face).v1];
-        auto v2 = vertices[(*face).v2];
-        auto v3 = vertices[(*face).v3];
+        auto v1 = vertices[(*face).x];
+        auto v2 = vertices[(*face).y];
+        auto v3 = vertices[(*face).z];
         auto faceVertices = {v1, v2, v3};
 
         for (auto it = faceVertices.begin() ; it != faceVertices.end(); ++it)
@@ -97,9 +96,9 @@ void Voxelizer::voxelizeFace(
     voxelizeFace(grid, mid1, mid2, mid3);
 }
 
-std::shared_ptr<ObjData>
+std::shared_ptr<tinyobj::ObjData>
 Voxelizer::Process(
-    std::shared_ptr<ObjData> data
+    std::shared_ptr<tinyobj::ObjData> data
 )
 {
     std::shared_ptr<std::vector<tinyobj::shape_t>> shapes = data->m_shapes;
@@ -107,10 +106,10 @@ Voxelizer::Process(
     for (unsigned int pp = 0; pp < shapes->size(); ++pp)
     {
         tinyobj::mesh_t& mesh = (*shapes)[pp].mesh;
-        std::vector<tinyobj::face_t>& faces = mesh.faces;
+        std::vector<glm::vec3>& faces = mesh.faces;
         std::vector<glm::vec3>& vertices = mesh.vertices;
 
-        setMinMaxXYZ(faces,vertices);
+        setMinMaxXYZ(faces, vertices);
 
         float s = std::min(std::min((m_maxX - m_minX), (m_maxY - m_minY)), (m_maxZ - m_minZ));
         m_subdivisions = 50;
@@ -129,16 +128,17 @@ Voxelizer::Process(
             std::vector<int>(m_depth, FILL_SHELL ? -1 : 0)));
 
         std::cout << "Voxelizing shell" << std::endl;
-        for (std::vector<tinyobj::face_t>::const_iterator face = faces.begin(); face != faces.end(); ++face )
+        for (std::vector<glm::vec3>::const_iterator face = faces.begin(); face != faces.end(); ++face )
         {
-            Vertex v1 = Vertex(vertices[face->v1].x, vertices[face->v1].y, vertices[face->v1].z);
-            Vertex v2 = Vertex(vertices[face->v2].x, vertices[face->v2].y, vertices[face->v2].z);
-            Vertex v3 = Vertex(vertices[face->v3].x, vertices[face->v3].y, vertices[face->v3].z);
-            voxelizeFace(grid, v1, v2, v3);
+            Vertex x = Vertex(vertices[face->x].x, vertices[face->x].y, vertices[face->x].z);
+            Vertex y = Vertex(vertices[face->y].x, vertices[face->y].y, vertices[face->y].z);
+            Vertex z = Vertex(vertices[face->z].x, vertices[face->z].y, vertices[face->z].z);
+            voxelizeFace(grid, x, y, z);
         }
 
-        if(FILL_SHELL)
+        if (FILL_SHELL) {
             fillShell(grid);
+        }
 
         vertices.clear();
         faces.clear();
@@ -153,7 +153,7 @@ Voxelizer::Process(
     return data;
 }
 
-void Voxelizer::voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std::vector<tinyobj::face_t>& faces, std::vector<glm::vec3>& vertices)
+void Voxelizer::voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices)
 {
     for (size_t i = 0; i < grid.size(); ++i)
     {
@@ -173,23 +173,23 @@ void Voxelizer::voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std
                     vertices.push_back(glm::vec3(i+1.0f+0.001f,(j*LEGO_SCALE)+0.0f+0.001f,k+1.0f+0.001f)); // 6
                     vertices.push_back(glm::vec3(i+1.0f+0.001f,(j*LEGO_SCALE)+LEGO_SCALE+0.001f,k+1.0f+0.001f)); // 7
 
-                    faces.push_back(tinyobj::face_t(last+1, last+2, last+0));
-                    faces.push_back(tinyobj::face_t(last+2, last+4, last+1));
+                    faces.push_back(glm::vec3(last+1, last+2, last+0));
+                    faces.push_back(glm::vec3(last+2, last+4, last+1));
 
-                    faces.push_back(tinyobj::face_t(last+0, last+3, last+2));
-                    faces.push_back(tinyobj::face_t(last+2, last+3, last+5));
+                    faces.push_back(glm::vec3(last+0, last+3, last+2));
+                    faces.push_back(glm::vec3(last+2, last+3, last+5));
 
-                    faces.push_back(tinyobj::face_t(last+4, last+6, last+1));
-                    faces.push_back(tinyobj::face_t(last+4, last+7, last+6));
+                    faces.push_back(glm::vec3(last+4, last+6, last+1));
+                    faces.push_back(glm::vec3(last+4, last+7, last+6));
 
-                    faces.push_back(tinyobj::face_t(last+2, last+5, last+4));
-                    faces.push_back(tinyobj::face_t(last+4, last+5, last+7));
+                    faces.push_back(glm::vec3(last+2, last+5, last+4));
+                    faces.push_back(glm::vec3(last+4, last+5, last+7));
 
-                    faces.push_back(tinyobj::face_t(last+3, last+0, last+1));
-                    faces.push_back(tinyobj::face_t(last+3, last+1, last+6));
+                    faces.push_back(glm::vec3(last+3, last+0, last+1));
+                    faces.push_back(glm::vec3(last+3, last+1, last+6));
 
-                    faces.push_back(tinyobj::face_t(last+5, last+6, last+7));
-                    faces.push_back(tinyobj::face_t(last+5, last+3, last+6));
+                    faces.push_back(glm::vec3(last+5, last+6, last+7));
+                    faces.push_back(glm::vec3(last+5, last+3, last+6));
                 }
             }
         }

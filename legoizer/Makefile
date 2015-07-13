@@ -81,7 +81,6 @@ run-test-teddy: $(TEST_TARGET)
 run-test-teapot: $(TEST_TARGET)
 	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
 
-
 run-dos2unix:
 	dos2unix
 

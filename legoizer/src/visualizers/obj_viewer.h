@@ -5,7 +5,6 @@
 
 #define GLFW_DLL
 
-#include "tiny_obj_loader.h"
 #include "obj_data.h"
 
 #include <GLFW/glfw3.h>
