@@ -12,15 +12,28 @@ pred connected[b1, b2 : one Brick] {
 	some v1 : b1.voxels |
 			some v2 : b2.voxels | aboveOrBelow[v1, v2]
 }
-sig OneOne, OneTwo, OneThree, OneFour, TwoTwo, L extends Brick {}
+sig OneOne, OneTwo, OneThree, OneFour, TwoTwo, LBlock, TwoThree, TwoFour extends Brick {}
 fun length[] : Brick -> Int {
-	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->2 + L->2}
+	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->2 +
+		LBlock->2 + TwoThree->2 + TwoFour->2}
 fun width[] : Brick -> Int {
-	OneOne->1 + OneTwo->1 + OneThree->1 + OneFour->1 + TwoTwo->2 + L->2}
+	OneOne->1 + OneTwo->1 + OneThree->1 + OneFour->1 + TwoTwo->2 +
+		LBlock->2 + TwoThree->3 + TwoFour->4}
 fun volume[] : Brick -> Int {
-	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->4 + L->3}
+	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->4 +
+		LBlock->3 + TwoThree->6 + TwoFour->8}
 
 abstract sig Voxel {}
+--2x2x1
+--one sig A, B, C, D extends Voxel {}
+--fun x[] : Voxel -> Int {
+--	A -> 0 + B -> 1 + C -> 0+ D->1}
+--fun y[] : Voxel -> Int {
+--	A -> 0 + B->0 + C-> 0 + D->0}
+--fun z[] : Voxel -> Int {
+--	A -> 0 + B->0 + C-> 1 + D->1}
+
+--2x2x2
 one sig A, B, C, D, E, F, G, H extends Voxel {}
 fun x[] : Voxel -> Int {
 	A -> 0 + B -> 0 + C -> 0+ D->0 + E->1 + F->1 + G->1 + H->1}
@@ -28,6 +41,15 @@ fun y[] : Voxel -> Int {
 	A -> 0 + B->1 + C-> 0 + D->1 + E->0 + F->1 + G->0 + H->1}
 fun z[] : Voxel -> Int {
 	A -> 0 + B->0 + C-> 1 + D->1 + E->0 + F->0 + G->1 + H->1}
+
+--Upside down pyramid (top layer 3x3, middle layer cross, bottom layer single brick)
+--one sig A, B, C, D, E, F, G, H, I, J, K, L, M, N, O extends Voxel {}
+--fun x[] : Voxel -> Int {
+--	A->-1 + B->0 + C->1 + D->-1 + E->0 + F->1 + G->-1 + H->0 + I->1 + J->0 + K->-1 + L->0 + N->1 + M->0 + O->0}
+--fun y[] : Voxel -> Int {
+--	A->1 + B->1 + C->1 + D->1 + E->1 + F->1 + G->1 + H->1 + I->1 + J->0 + K->0 + L->0 + N->0 + M->0 + O->-1}
+--fun z[] : Voxel -> Int {
+--	A->-1 + B->-1 + C->-1 + D->0 + E->0 + F->0 + G->1 + H->1 + I->1 + J->-1 + K->0 + L->0 + N->0 + M->1 + O->0}
 pred above[v1, v2 : one Voxel] {
 	v1.x = v2.x
 	v1.z = v2.z
@@ -76,6 +98,8 @@ fact WellPlaced {
 			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) <= b.width) or
  		(#(v.*(b.voxels <: xAdjacent :> b.voxels)) <= b.width and
 			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) <= b.length)
+ 	-- There must be at least one TwoTwo brick used
+	--#(TwoTwo <: Brick) > 0
 }
 pred build {}
 run build for 6 but 6 Int
