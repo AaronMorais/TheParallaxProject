@@ -5,25 +5,23 @@
 #include <vector>
 #include <memory>
 
+namespace plx {
+
 class Voxelizer {
 public:
-    Voxelizer();
-    std::shared_ptr<tinyobj::ObjData> Process(std::shared_ptr<tinyobj::ObjData> data);
+    Voxelizer(std::shared_ptr<tinyobj::ObjData>);
+    void process();
 
 private:
     const float LEGO_SCALE = 1.230769; // height to width ratio (height: 9.6mm / width,depth: 7.8mm)
 
-    struct Vertex {
-        float x, y, z;
-        Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
-    };
-
     void setMinMaxXYZ(std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices);
-    void voxelizeFace(std::vector<std::vector<std::vector<int>>>& grid, Vertex& v1, Vertex& v2, Vertex& v3);
+    void voxelizeFace(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
     void voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices);
-    Vertex midPoint(Vertex& v1, Vertex& v2);
-    bool samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, Vertex& v1, Vertex& v2, Vertex& v3);
+    bool samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
     void fillShell(std::vector<std::vector<std::vector<int>>>& grid);
+
+    static glm::vec3 midpoint(glm::vec3& v1, glm::vec3& v2);
 
     float m_maxX;
     float m_maxY;
@@ -39,5 +37,7 @@ private:
     float m_subdivisions;
     float m_unit;
 };
+
+}
 
 #endif

@@ -12,6 +12,9 @@ class ObjData {
 public:
     ObjData(std::shared_ptr<std::vector<tinyobj::shape_t>> shapes, std::shared_ptr<std::vector<tinyobj::material_t>> materials);
 
+    void InfoPrint();
+    void ObjPrint(std::ostream& os);
+
     std::shared_ptr<std::vector<tinyobj::shape_t>> m_shapes;
     std::shared_ptr<std::vector<tinyobj::material_t>> m_materials;
 
@@ -19,10 +22,6 @@ public:
     public:
         static std::shared_ptr<tinyobj::ObjData> Create(const char* filename, const char* basepath = nullptr);
     };
-
-private:
-    void InfoPrint();
-    void ObjPrint(std::ostream& os);
 };
 
 }

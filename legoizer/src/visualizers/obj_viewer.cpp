@@ -68,9 +68,9 @@ ObjViewer::Run()
     glfwSetWindowCloseCallback(m_window, GetInstance().s_HandleQuit);
 
     /* register function to handle keyboard input */
-    glfwSetKeyCallback(m_window, ObjViewer::GetInstance().s_HandleKeyboard);      // general keyboard input
-    glfwSetCharCallback(m_window, ObjViewer::GetInstance().s_HandleCharacter);  // ser specific character handling
-    glfwSetScrollCallback(m_window, ObjViewer::GetInstance().s_HandleScroll);
+    glfwSetKeyCallback(m_window, GetInstance().s_HandleKeyboard);      // general keyboard input
+    glfwSetCharCallback(m_window, GetInstance().s_HandleCharacter);  // ser specific character handling
+    glfwSetScrollCallback(m_window, GetInstance().s_HandleScroll);
 
 
     do {

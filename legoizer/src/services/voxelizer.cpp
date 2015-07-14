@@ -6,6 +6,8 @@
 
 const bool FILL_SHELL = false;
 
+namespace plx {
+
 Voxelizer::Voxelizer() :
     m_maxX(INT_MIN),
     m_maxY(INT_MIN),
@@ -16,86 +18,6 @@ Voxelizer::Voxelizer() :
 {
 }
 
-void Voxelizer::setMinMaxXYZ(std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices)
-{
-    for (std::vector<glm::vec3>::iterator face = faces.begin(); face != faces.end(); ++face )
-    {
-        auto v1 = vertices[(*face).x];
-        auto v2 = vertices[(*face).y];
-        auto v3 = vertices[(*face).z];
-        auto faceVertices = {v1, v2, v3};
-
-        for (auto it = faceVertices.begin() ; it != faceVertices.end(); ++it)
-        {
-            glm::vec3 vertex = *it;
-            if (vertex.x > m_maxX) {
-                m_maxX = vertex.x;
-            }
-            if (vertex.x < m_minX) {
-                m_minX = vertex.x;
-            }
-            if (vertex.y > m_maxY) {
-                m_maxY = vertex.y;
-            }
-            if (vertex.y < m_minY) {
-                m_minY = vertex.y;
-            }
-            if (vertex.z > m_maxZ) {
-                m_maxZ = vertex.z;
-            }
-            if (vertex.z < m_minZ) {
-                m_minZ = vertex.z;
-            }
-        }
-    }
-}
-
-Voxelizer::Vertex Voxelizer::midPoint(Vertex& v1, Vertex& v2)
-{
-    return Vertex((v1.x + v2.x) / 2, (v1.y + v2.y) / 2, (v1.z + v2.z) / 2);
-}
-
-bool Voxelizer::samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, Vertex& v1, Vertex& v2, Vertex& v3)
-{
-    return  std::abs((int)v1.x - (int)v2.x) < 2 &&
-            std::abs((int)v2.x - (int)v3.x) < 2 &&
-            std::abs((int)v1.y - (int)v2.y) < 2 &&
-            std::abs((int)v2.y - (int)v3.y) < 2 &&
-            std::abs((int)v1.z - (int)v2.z) < 2 &&
-            std::abs((int)v2.z - (int)v3.z) < 2 &&
-            grid[(int)v1.x][(int)v1.y][(int)v1.z] == 1 &&
-            grid[(int)v2.x][(int)v2.y][(int)v2.z] == 1 &&
-            grid[(int)v3.x][(int)v3.y][(int)v3.z] == 1;
-}
-
-
-void Voxelizer::voxelizeFace(
-    std::vector<std::vector<std::vector<int>>>& grid,
-    Vertex& v1, Vertex& v2, Vertex& v3)
-{
-    // scale model to NxNxN grid
-    Vertex p1 = Vertex((v1.x - m_minX) / m_unit, (v1.y - m_minY) / (m_unit * LEGO_SCALE), (v1.z - m_minZ) / m_unit);
-    Vertex p2 = Vertex((v2.x - m_minX) / m_unit, (v2.y - m_minY) / (m_unit * LEGO_SCALE), (v2.z - m_minZ) / m_unit);
-    Vertex p3 = Vertex((v3.x - m_minX) / m_unit, (v3.y - m_minY) / (m_unit * LEGO_SCALE), (v3.z - m_minZ) / m_unit);
-
-    if (samePointAndOccupied(grid, p1, p2, p3)){
-        return;
-    }
-
-    grid[(int)p1.x][(int)p1.y][(int)p1.z] = 1;
-    grid[(int)p2.x][(int)p2.y][(int)p2.z] = 1;
-    grid[(int)p3.x][(int)p3.y][(int)p3.z] = 1;
-
-    Vertex mid1 = midPoint(v1, v2);
-    Vertex mid2 = midPoint(v2, v3);
-    Vertex mid3 = midPoint(v1, v3);
-
-    voxelizeFace(grid, v1, mid1, mid3);
-    voxelizeFace(grid, mid1, v2, mid2);
-    voxelizeFace(grid, mid3, mid2, v3);
-    voxelizeFace(grid, mid1, mid2, mid3);
-}
-
 std::shared_ptr<tinyobj::ObjData>
 Voxelizer::Process(
     std::shared_ptr<tinyobj::ObjData> data
@@ -103,9 +25,9 @@ Voxelizer::Process(
 {
     std::shared_ptr<std::vector<tinyobj::shape_t>> shapes = data->m_shapes;
 
-    for (unsigned int pp = 0; pp < shapes->size(); ++pp)
+    for (tinyobj::shape_t& shape : shapes)
     {
-        tinyobj::mesh_t& mesh = (*shapes)[pp].mesh;
+        tinyobj::mesh_t& mesh = shape.mesh;
         std::vector<glm::vec3>& faces = mesh.faces;
         std::vector<glm::vec3>& vertices = mesh.vertices;
 
@@ -128,11 +50,10 @@ Voxelizer::Process(
             std::vector<int>(m_depth, FILL_SHELL ? -1 : 0)));
 
         std::cout << "Voxelizing shell" << std::endl;
-        for (std::vector<glm::vec3>::const_iterator face = faces.begin(); face != faces.end(); ++face )
-        {
-            Vertex x = Vertex(vertices[face->x].x, vertices[face->x].y, vertices[face->x].z);
-            Vertex y = Vertex(vertices[face->y].x, vertices[face->y].y, vertices[face->y].z);
-            Vertex z = Vertex(vertices[face->z].x, vertices[face->z].y, vertices[face->z].z);
+        for (glm::vec3& face : faces) {
+            glm::vec3 x(vertices[face.x].x, vertices[face.x].y, vertices[face.x].z);
+            glm::vec3 y(vertices[face.y].x, vertices[face.y].y, vertices[face.y].z);
+            glm::vec3 z(vertices[face.z].x, vertices[face.z].y, vertices[face.z].z);
             voxelizeFace(grid, x, y, z);
         }
 
@@ -152,6 +73,82 @@ Voxelizer::Process(
 
     return data;
 }
+
+
+
+void Voxelizer::setMinMaxXYZ(std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices)
+{
+    for (glm::vec3& face : faces)
+    {
+        std::vector<glm::vec3> faceVertices;
+        faceVertices.push_back(vertices[face.x]);
+        faceVertices.push_back(vertices[face.y]);
+        faceVertices.push_back(vertices[face.z]);
+
+        for (glm::vec3& vertex : faceVertices) {
+            if (vertex.x > m_maxX) {
+                m_maxX = vertex.x;
+            }
+            if (vertex.x < m_minX) {
+                m_minX = vertex.x;
+            }
+            if (vertex.y > m_maxY) {
+                m_maxY = vertex.y;
+            }
+            if (vertex.y < m_minY) {
+                m_minY = vertex.y;
+            }
+            if (vertex.z > m_maxZ) {
+                m_maxZ = vertex.z;
+            }
+            if (vertex.z < m_minZ) {
+                m_minZ = vertex.z;
+            }
+        }
+    }
+}
+
+bool Voxelizer::samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+{
+    return  std::abs((int)v1.x - (int)v2.x) < 2 &&
+            std::abs((int)v2.x - (int)v3.x) < 2 &&
+            std::abs((int)v1.y - (int)v2.y) < 2 &&
+            std::abs((int)v2.y - (int)v3.y) < 2 &&
+            std::abs((int)v1.z - (int)v2.z) < 2 &&
+            std::abs((int)v2.z - (int)v3.z) < 2 &&
+            grid[(int)v1.x][(int)v1.y][(int)v1.z] == 1 &&
+            grid[(int)v2.x][(int)v2.y][(int)v2.z] == 1 &&
+            grid[(int)v3.x][(int)v3.y][(int)v3.z] == 1;
+}
+
+
+void Voxelizer::voxelizeFace(
+    std::vector<std::vector<std::vector<int>>>& grid,
+    glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+{
+    // scale model to NxNxN grid
+    glm::vec3 p1 = glm::vec3((v1.x - m_minX) / m_unit, (v1.y - m_minY) / (m_unit * LEGO_SCALE), (v1.z - m_minZ) / m_unit);
+    glm::vec3 p2 = glm::vec3((v2.x - m_minX) / m_unit, (v2.y - m_minY) / (m_unit * LEGO_SCALE), (v2.z - m_minZ) / m_unit);
+    glm::vec3 p3 = glm::vec3((v3.x - m_minX) / m_unit, (v3.y - m_minY) / (m_unit * LEGO_SCALE), (v3.z - m_minZ) / m_unit);
+
+    if (samePointAndOccupied(grid, p1, p2, p3)){
+        return;
+    }
+
+    grid[(int)p1.x][(int)p1.y][(int)p1.z] = 1;
+    grid[(int)p2.x][(int)p2.y][(int)p2.z] = 1;
+    grid[(int)p3.x][(int)p3.y][(int)p3.z] = 1;
+
+    glm::vec3 mid1 = midpoint(v1, v2);
+    glm::vec3 mid2 = midpoint(v2, v3);
+    glm::vec3 mid3 = midpoint(v1, v3);
+
+    voxelizeFace(grid, v1, mid1, mid3);
+    voxelizeFace(grid, mid1, v2, mid2);
+    voxelizeFace(grid, mid3, mid2, v3);
+    voxelizeFace(grid, mid1, mid2, mid3);
+}
+
 
 void Voxelizer::voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices)
 {
@@ -299,4 +296,15 @@ void Voxelizer::fillShell(std::vector<std::vector<std::vector<int>>>& grid)
     }
 
     std::cout<<"Shell Filled"<<std::endl;
+}
+
+glm::vec3
+Voxelizer::midpoint(
+    glm::vec3& v1,
+    glm::vec3& v2
+    )
+{
+    return glm::vec3((v1.x + v2.x)/ 2, (v1.y + v2.y)/ 2, (v1.z + v2.z)/ 2);
+}
+
 }
