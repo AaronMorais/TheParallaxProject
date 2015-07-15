@@ -41,11 +41,11 @@ fun volume[] : Brick -> Int {
 		LPlate->3 + TwoTwoPlate->4 + TwoThreePlate->6 + TwoFourPlate->8 +
 		ThreeThreePlate -> 9}
 fun inventory[] : Brick -> Int {
-	OneOne->1 + OneTwo->1 + OneThree->1 + OneFour->1 +
-		TwoTwo->1 + LBlock->1 + TwoThree->1 + TwoFour->1 +
-		OneOnePlate->5 + OneTwoPlate->4 + OneThreePlate->0 + OneFourPlate->4 +
-		LPlate->0 + TwoTwoPlate->0 + TwoThreePlate->1 + TwoFourPlate->8 +
-		ThreeThreePlate -> 1}
+	OneOne->10 + OneTwo->10 + OneThree->10 + OneFour->10 +
+		TwoTwo->10 + LBlock->10 + TwoThree->10 + TwoFour->10 +
+		OneOnePlate->10 + OneTwoPlate->10 + OneThreePlate->10 + OneFourPlate->10 +
+		LPlate->10 + TwoTwoPlate->0 + TwoThreePlate->0 + TwoFourPlate->10 +
+		ThreeThreePlate -> 0}
 
 abstract sig Colour {}
 one sig Red, Blue, Yellow extends Colour {}
@@ -101,7 +101,7 @@ fact WellPlaced {
  		(#(v.*(b.voxels <: xAdjacent :> b.voxels)) <= b.width and
 			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) <= b.length)
  	-- Each voxel in the brick must be the same colour as the brick
-	all b : Brick | all v : b.voxels | v.colour = b.colour
+	-- all b : Brick | all v : b.voxels | v.colour = b.colour
 	--	Each brick is only as tall as brick allows
 	all b : Brick | all v : b.voxels |
 		 #(v.*(b.voxels <: yAdjacent :> b.voxels)) <= b.height

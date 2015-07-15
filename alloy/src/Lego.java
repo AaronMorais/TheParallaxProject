@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import org.json.simple.JSONValue;
 import java.io.PrintWriter;
+import java.lang.Thread;
 
 import edu.mit.csail.sdg.alloy4.A4Reporter;
 import edu.mit.csail.sdg.alloy4.XMLNode;
@@ -76,7 +77,7 @@ public class Lego {
     }
 
     Expr zVoxel = CompUtil.parseOneExpression_fromString(world, "Voxel<:z");
-    itr = ((A4TupleSet)sol.eval(xVoxel)).iterator();
+    itr = ((A4TupleSet)sol.eval(zVoxel)).iterator();
     while (itr.hasNext()) {
       A4Tuple element = (A4Tuple)itr.next();
       ((LinkedHashMap)voxels.get(element.atom(0))).put("z", element.atom(1));
@@ -109,6 +110,12 @@ public class Lego {
     PrintWriter out = new PrintWriter(output_json_file_name);
     out.println(listJSON);
     out.close();
+
+    System.out.println("Displaying result at localhost:3000");
+    Process p = Runtime.getRuntime().exec("python -m SimpleHTTPServer 3000");
+    Process p2 = Runtime.getRuntime().exec("open localhost:3000");
+    p2.waitFor();
+    p.waitFor();
   }
 
   private static void flushModelToFile(String model, File tmpAls) throws IOException {

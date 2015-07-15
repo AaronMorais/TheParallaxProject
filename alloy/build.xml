@@ -40,10 +40,24 @@
     <delete file="parallax.jar" />
   </target>
 
-  <target name="test" description="Run test #1" depends="compile">
+  <target name="test" description="Run cube test" depends="compile">
     <java classname="Lego"
       classpathref="parallax.classpath" failonerror="true">
       <arg line="-model models/cube.model"/>
+    </java>
+  </target>
+
+  <target name="pyramid" description="Run pyramid test" depends="compile">
+    <java classname="Lego"
+      classpathref="parallax.classpath" failonerror="true">
+      <arg line="-model models/pyramid.model"/>
+    </java>
+  </target>
+
+  <target name="lblock" description="Run L-Block test" depends="compile">
+    <java classname="Lego"
+      classpathref="parallax.classpath" failonerror="true">
+      <arg line="-model models/l-block.model"/>
     </java>
   </target>
 
