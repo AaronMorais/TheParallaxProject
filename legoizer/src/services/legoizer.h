@@ -14,6 +14,9 @@ public:
 
     std::shared_ptr<plx::LegoData> data();
 
+    static int subdivisions;
+    static bool shouldFillShell;
+
 private:
     std::shared_ptr<plx::LegoData> m_data;
 };

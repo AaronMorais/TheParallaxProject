@@ -3,6 +3,9 @@
 
 namespace plx {
 
+int Legoizer::subdivisions = 40;
+bool Legoizer::shouldFillShell = false;
+
 Legoizer::Legoizer(std::shared_ptr<plx::LegoData> data)
 {
     m_data = data;

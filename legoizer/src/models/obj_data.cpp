@@ -31,7 +31,7 @@ ObjData::Factory::Create(
     const char* basepath
     )
 {
-    std::cout << "Loading from file:" << " " << filename << std::endl;
+    std::cerr << "Loading from file:" << " " << filename << std::endl;
 
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
