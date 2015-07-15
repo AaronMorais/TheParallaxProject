@@ -56,6 +56,10 @@ LegoData::printAlloy(
 
     os << "--" << voxels.size() << " " << "number of voxels" << std::endl;
 
+    for (size_t i = 0; i < voxels.size(); i++) {
+        os << "-- Block" << i << " -> " << (int)(voxels[i].x) << "," << (int)(voxels[i].y) << "," << (int)(voxels[i].z) << std::endl;
+    }
+
     os << "abstract sig Voxel {}" << std::endl;
 
     os << "one sig" << " ";
