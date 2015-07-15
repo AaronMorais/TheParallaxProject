@@ -2,40 +2,62 @@
 #define _VOXELIZER_H__
 
 #include "obj_data.h"
+#include "lego_data.h"
 #include <vector>
 #include <memory>
 
 namespace plx {
 
 class Voxelizer {
+
 public:
-    Voxelizer(std::shared_ptr<tinyobj::ObjData>);
-    void process();
+    Voxelizer(std::shared_ptr<plx::LegoData> data);
+    void voxelize();
+    std::shared_ptr<plx::LegoData> data();
+
+    static constexpr float scale() {
+        return 1.230769;
+    }
+
+    static constexpr int subdivisions() {
+        return 40;
+    }
+
+    static constexpr bool shouldFillShell() {
+        return true;
+    }
+
+    class ShapeVoxelizer {
+    public:
+        ShapeVoxelizer(std::shared_ptr<plx::LegoData> data, const tinyobj::shape_t& shape);
+        void voxelize();
+        std::shared_ptr<plx::LegoData> data();
+
+    private:
+        std::shared_ptr<plx::LegoData> m_data;
+        const tinyobj::shape_t& m_shape;
+
+        static std::tuple<glm::vec3, glm::vec3> calculateMinMaxDimensions(const std::vector<glm::vec3>& faces, const std::vector<glm::vec3>& vertices);
+        static float calculateVoxelUnit(glm::vec3& min, glm::vec3& max);
+        static glm::vec3 calculateVoxelGridDimensions(glm::vec3& min, glm::vec3& max, float voxel_unit);
+
+        bool arePointsClose(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+        bool arePointsOnOccupiedVoxel(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+
+        void voxelize(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+        void fillShell();
+        void save();
+
+        glm::vec3 m_min;
+        glm::vec3 m_max;
+        float m_unit;
+        glm::vec3 m_dimensions;
+
+        std::vector<std::vector<std::vector<int>>> m_grid;
+    };
 
 private:
-    const float LEGO_SCALE = 1.230769; // height to width ratio (height: 9.6mm / width,depth: 7.8mm)
-
-    void setMinMaxXYZ(std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices);
-    void voxelizeFace(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
-    void voxelToOBJ(std::vector<std::vector<std::vector<int>>>& grid, std::vector<glm::vec3>& faces, std::vector<glm::vec3>& vertices);
-    bool samePointAndOccupied(std::vector<std::vector<std::vector<int>>>& grid, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
-    void fillShell(std::vector<std::vector<std::vector<int>>>& grid);
-
-    static glm::vec3 midpoint(glm::vec3& v1, glm::vec3& v2);
-
-    float m_maxX;
-    float m_maxY;
-    float m_maxZ;
-    float m_minX;
-    float m_minY;
-    float m_minZ;
-
-    float m_width;
-    float m_height;
-    float m_depth;
-
-    float m_subdivisions;
-    float m_unit;
+    std::shared_ptr<plx::LegoData> m_data;
 };
 
 }

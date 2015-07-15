@@ -1,13 +1,16 @@
 #include "legoizer.h"
+#include "voxelizer.h"
 
 namespace plx {
 
-Legoizer::Legoizer(std::shared_ptr<tinyobj::ObjData> data) {
+Legoizer::Legoizer(std::shared_ptr<plx::LegoData> data) {
     m_data = data;
 }
 
-void Legoizer::process() {
+void Legoizer::voxelize() {
+    std::shared_ptr<plx::Voxelizer> voxelizer = std::make_shared<plx::Voxelizer>(m_data);
 
+    voxelizer->voxelize();
 }
 
 }

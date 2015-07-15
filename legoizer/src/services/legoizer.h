@@ -1,17 +1,18 @@
 #ifndef _LEGOIZER_H__
 #define _LEGOIZER_H__
 
-#include "obj_data.h"
+#include "lego_data.h"
+#include <memory>
 
 namespace plx {
 
 class Legoizer {
 public:
-    Legoizer(std::shared_ptr<tinyobj::ObjData> data);
+    Legoizer(std::shared_ptr<plx::LegoData> data);
 
     void voxelize();
 private:
-    std::shared_ptr<tinyobj::ObjData> m_data;
+    std::shared_ptr<plx::LegoData> m_data;
 };
 
 }

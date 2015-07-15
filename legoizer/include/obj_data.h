@@ -10,18 +10,30 @@ namespace tinyobj {
 
 class ObjData {
 public:
-    ObjData(std::shared_ptr<std::vector<tinyobj::shape_t>> shapes, std::shared_ptr<std::vector<tinyobj::material_t>> materials);
+    ObjData(
+        std::vector<tinyobj::shape_t>& shapes,
+        std::vector<tinyobj::material_t>& materials
+        );
 
-    void InfoPrint();
-    void ObjPrint(std::ostream& os);
+    const std::vector<tinyobj::shape_t>& shapes() const;
+    const std::vector<tinyobj::material_t>& materials() const;
 
-    std::shared_ptr<std::vector<tinyobj::shape_t>> m_shapes;
-    std::shared_ptr<std::vector<tinyobj::material_t>> m_materials;
+    void PrintShapes() const;
+    void PrintMaterials() const;
+
+    void PrintObj(std::ostream& os) const;
 
     class Factory {
     public:
-        static std::shared_ptr<tinyobj::ObjData> Create(const char* filename, const char* basepath = nullptr);
+        static std::shared_ptr<tinyobj::ObjData> Create(
+            const char* filename,
+            const char* basepath = nullptr
+            );
     };
+
+private:
+    std::vector<tinyobj::shape_t> m_shapes;
+    std::vector<tinyobj::material_t> m_materials;
 };
 
 }

@@ -5,12 +5,24 @@
 namespace tinyobj {
 
 ObjData::ObjData(
-    std::shared_ptr<std::vector<tinyobj::shape_t>> shapes,
-    std::shared_ptr<std::vector<tinyobj::material_t>> materials
-    )
+    std::vector<tinyobj::shape_t>& shapes,
+    std::vector<tinyobj::material_t>& materials
+    ) :
+    m_shapes(shapes),
+    m_materials(materials)
 {
-    m_shapes = shapes;
-    m_materials = materials;
+}
+
+const std::vector<tinyobj::shape_t>&
+ObjData::shapes() const
+{
+    return m_shapes;
+}
+
+const std::vector<tinyobj::material_t>&
+ObjData::materials() const
+{
+    return m_materials;
 }
 
 std::shared_ptr<ObjData>
@@ -31,20 +43,15 @@ ObjData::Factory::Create(
         return nullptr;
     }
 
-    std::shared_ptr<std::vector<tinyobj::shape_t>> dataShapes = std::make_shared<std::vector<tinyobj::shape_t>>(shapes);
-    std::shared_ptr<std::vector<tinyobj::material_t>> dataMaterials = std::make_shared<std::vector<tinyobj::material_t>>(materials);
-    std::shared_ptr<ObjData> data = std::make_shared<ObjData>(dataShapes, dataMaterials);
-    return data;
+    return std::make_shared<ObjData>(shapes, materials);
 }
 
 void
-ObjData::InfoPrint()
+ObjData::PrintShapes() const
 {
-    const std::vector<tinyobj::shape_t>& shapes = *m_shapes;
-    const std::vector<tinyobj::material_t>& materials = *m_materials;
+    const std::vector<tinyobj::shape_t>& shapes = this->shapes();
 
     std::cout << "# of shapes    : " << shapes.size() << std::endl;
-    std::cout << "# of materials : " << materials.size() << std::endl;
 
     for (size_t i = 0; i < shapes.size(); i++) {
         printf("shape[%u].name = %s\n", i, shapes[i].name.c_str());
@@ -64,7 +71,14 @@ ObjData::InfoPrint()
                 shapes[i].mesh.positions[3*v+2]);
         }
     }
+}
 
+void
+ObjData::PrintMaterials() const
+{
+    const std::vector<tinyobj::material_t>& materials = this->materials();
+
+    std::cout << "# of materials : " << materials.size() << std::endl;
     for (size_t i = 0; i < materials.size(); i++) {
         printf("material[%u].name = %s\n", i, materials[i].name.c_str());
         printf("  material.Ka = (%f, %f ,%f)\n", materials[i].ambient[0], materials[i].ambient[1], materials[i].ambient[2]);
@@ -90,29 +104,22 @@ ObjData::InfoPrint()
 }
 
 void
-ObjData::ObjPrint(
+ObjData::PrintObj(
     std::ostream& os
-    )
+    ) const
 {
-    for (tinyobj::shape_t& shape : (*m_shapes))
+    for (const tinyobj::shape_t& shape : this->shapes())
     {
         os << "g" << std::endl;
 
-        tinyobj::mesh_t& mesh = shape.mesh;
-        std::vector<glm::vec3>& vertices = mesh.vertices;
-        std::vector<glm::vec3>& faces = mesh.faces;
-
-        for (glm::vec3& vertex : vertices) {
+        for (const glm::vec3& vertex : shape.mesh.vertices) {
             os << "v " << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
         }
 
-        os << std::endl;
-
-        for (glm::vec3& face : faces) {
+        for (const glm::vec3& face : shape.mesh.faces) {
             os << "f " << face.x << " " << face.y << " " << face.z << std::endl;
         }
     }
-
 }
 
 }

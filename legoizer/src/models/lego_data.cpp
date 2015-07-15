@@ -2,16 +2,24 @@
 
 namespace plx {
 
-LegoData::LegoData(std::shared_ptr<tinyobj::ObjData> data) {
+LegoData::LegoData(std::shared_ptr<tinyobj::ObjData> data)
+{
     m_data = data;
 }
 
-void LegoData::InfoPrint() {
-    m_data->InfoPrint();
+std::vector<glm::vec3>& LegoData::faces()
+{
+    return m_faces;
 }
 
-void LegoData::ObjPrint(std::ostream& os) {
-    m_data->ObjPrint(os);
+std::vector<glm::vec3>& LegoData::vertices()
+{
+    return m_vertices;
+}
+
+std::shared_ptr<tinyobj::ObjData> LegoData::data()
+{
+    return m_data;
 }
 
 }

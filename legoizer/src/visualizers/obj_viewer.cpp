@@ -309,7 +309,7 @@ ObjViewer::Render()
     glScalef(m_scale, m_scale, m_scale);
 
 
-    auto shapes = m_data->m_shapes;
+    auto shapes = m_data->shapes();
 
     glPushMatrix();
     glRotatef(m_horizontalAngle, 0, 1, 0);

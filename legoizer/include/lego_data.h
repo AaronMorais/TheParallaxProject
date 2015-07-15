@@ -9,10 +9,13 @@ class LegoData {
 public:
     LegoData(std::shared_ptr<tinyobj::ObjData> data);
 
-    void InfoPrint();
-    void ObjPrint(std::ostream& os);
+    std::vector<glm::vec3>& faces();
+    std::vector<glm::vec3>& vertices();
+    std::shared_ptr<tinyobj::ObjData> data();
 
 private:
+    std::vector<glm::vec3> m_faces;
+    std::vector<glm::vec3> m_vertices;
     std::shared_ptr<tinyobj::ObjData> m_data;
 };
 
