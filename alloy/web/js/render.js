@@ -71,18 +71,25 @@ function addGrid(scene) {
 function addVoxels(scene) {
     $.getJSON("lego.json" , function(result) {
         var colors = {};
-        $.each(result["bricks"], function(key, value) {
-            colors[value] = getRandomColor();
-        });
+        var voxelWidth = 50;
+        var voxelHeight = (50 * 3.2) / 15.9;
+        var voxelDepth = 50;
+        var voxelGeometry = new THREE.BoxGeometry(voxelWidth, voxelHeight, voxelDepth);
 
-        $.each(result["voxels"], function(key, value) {
-            console.log(key, value, result["voxelToBrick"][key]);
-            cube = new THREE.Mesh( new THREE.BoxGeometry( 50, (50 * 3.2) / 15.9, 50 ), new THREE.MeshBasicMaterial() );
-            cube.position.x = value["x"] * 50 + 25;
-            cube.position.y = value["y"] * (50 * 3.2) / 15.9 + ((50 * 3.2) / 15.9) / 2;
-            cube.position.z = value["z"] * 50 + 25;
-            cube.material.color.setHex(toHex(colors[result["voxelToBrick"][key]]));
-            scene.add(cube);
+        $.each(result["bricks"], function(key, value) {
+            brickMaterial = new THREE.MeshBasicMaterial( { color : getRandomColor() } );    
+            $.each(value, function(i, voxelKey) {
+                var voxelLocation = result["voxels"][voxelKey];
+                cube = new THREE.Mesh( voxelGeometry, brickMaterial );
+                console.log(voxelLocation);
+                cube.position.x = voxelLocation.x * voxelWidth + ( voxelWidth / 2 );
+                cube.position.y = voxelLocation.y * voxelHeight + ( voxelHeight / 2 );
+                cube.position.z = voxelLocation.z * voxelDepth + (voxelDepth / 2);
+                scene.add(cube);
+            });
+            
+            
+
         });
     });
 }
