@@ -1,0 +1,57 @@
+--46 number of voxels
+-- Block0 -> 0,0,1
+-- Block1 -> 0,0,2
+-- Block2 -> 0,1,1
+-- Block3 -> 0,1,2
+-- Block4 -> 1,0,0
+-- Block5 -> 1,0,1
+-- Block6 -> 1,0,2
+-- Block7 -> 1,0,3
+-- Block8 -> 1,1,0
+-- Block9 -> 1,1,1
+-- Block10 -> 1,1,2
+-- Block11 -> 1,1,3
+-- Block12 -> 2,0,0
+-- Block13 -> 2,0,1
+-- Block14 -> 2,0,2
+-- Block15 -> 2,0,3
+-- Block16 -> 2,1,0
+-- Block17 -> 2,1,1
+-- Block18 -> 2,1,2
+-- Block19 -> 2,1,3
+-- Block20 -> 2,2,1
+-- Block21 -> 2,2,2
+-- Block22 -> 3,0,0
+-- Block23 -> 3,0,1
+-- Block24 -> 3,0,2
+-- Block25 -> 3,0,3
+-- Block26 -> 3,1,0
+-- Block27 -> 3,1,1
+-- Block28 -> 3,1,2
+-- Block29 -> 3,1,3
+-- Block30 -> 3,2,1
+-- Block31 -> 3,2,2
+-- Block32 -> 4,0,0
+-- Block33 -> 4,0,1
+-- Block34 -> 4,0,2
+-- Block35 -> 4,0,3
+-- Block36 -> 4,1,0
+-- Block37 -> 4,1,1
+-- Block38 -> 4,1,2
+-- Block39 -> 4,1,3
+-- Block40 -> 5,0,1
+-- Block41 -> 5,0,2
+-- Block42 -> 5,1,1
+-- Block43 -> 5,1,2
+-- Block44 -> 6,1,1
+-- Block45 -> 6,1,2
+abstract sig Voxel {}
+one sig Block0, Block1, Block2, Block3, Block4, Block5, Block6, Block7, Block8, Block9, Block10, Block11, Block12, Block13, Block14, Block15, Block16, Block17, Block18, Block19, Block20, Block21, Block22, Block23, Block24, Block25, Block26, Block27, Block28, Block29, Block30, Block31, Block32, Block33, Block34, Block35, Block36, Block37, Block38, Block39, Block40, Block41, Block42, Block43, Block44, Block45 extends Voxel {}
+fun x[] : Voxel -> Int {
+Block0->0+Block1->0+Block2->0+Block3->0+Block4->1+Block5->1+Block6->1+Block7->1+Block8->1+Block9->1+Block10->1+Block11->1+Block12->2+Block13->2+Block14->2+Block15->2+Block16->2+Block17->2+Block18->2+Block19->2+Block20->2+Block21->2+Block22->3+Block23->3+Block24->3+Block25->3+Block26->3+Block27->3+Block28->3+Block29->3+Block30->3+Block31->3+Block32->4+Block33->4+Block34->4+Block35->4+Block36->4+Block37->4+Block38->4+Block39->4+Block40->5+Block41->5+Block42->5+Block43->5+Block44->6+Block45->6}
+fun y[] : Voxel -> Int {
+Block0->0+Block1->0+Block2->1+Block3->1+Block4->0+Block5->0+Block6->0+Block7->0+Block8->1+Block9->1+Block10->1+Block11->1+Block12->0+Block13->0+Block14->0+Block15->0+Block16->1+Block17->1+Block18->1+Block19->1+Block20->2+Block21->2+Block22->0+Block23->0+Block24->0+Block25->0+Block26->1+Block27->1+Block28->1+Block29->1+Block30->2+Block31->2+Block32->0+Block33->0+Block34->0+Block35->0+Block36->1+Block37->1+Block38->1+Block39->1+Block40->0+Block41->0+Block42->1+Block43->1+Block44->1+Block45->1}
+fun z[] : Voxel -> Int {
+Block0->1+Block1->2+Block2->1+Block3->2+Block4->0+Block5->1+Block6->2+Block7->3+Block8->0+Block9->1+Block10->2+Block11->3+Block12->0+Block13->1+Block14->2+Block15->3+Block16->0+Block17->1+Block18->2+Block19->3+Block20->1+Block21->2+Block22->0+Block23->1+Block24->2+Block25->3+Block26->0+Block27->1+Block28->2+Block29->3+Block30->1+Block31->2+Block32->0+Block33->1+Block34->2+Block35->3+Block36->0+Block37->1+Block38->2+Block39->3+Block40->1+Block41->2+Block42->1+Block43->2+Block44->1+Block45->2}
+fun colour[] : Voxel -> Colour {
+Block0->Red+Block1->Red+Block2->Red+Block3->Red+Block4->Red+Block5->Red+Block6->Red+Block7->Red+Block8->Red+Block9->Red+Block10->Red+Block11->Red+Block12->Red+Block13->Red+Block14->Red+Block15->Red+Block16->Red+Block17->Red+Block18->Red+Block19->Red+Block20->Red+Block21->Red+Block22->Red+Block23->Red+Block24->Red+Block25->Red+Block26->Red+Block27->Red+Block28->Red+Block29->Red+Block30->Red+Block31->Red+Block32->Red+Block33->Red+Block34->Red+Block35->Red+Block36->Red+Block37->Red+Block38->Red+Block39->Red+Block40->Red+Block41->Red+Block42->Red+Block43->Red+Block44->Red+Block45->Red}
