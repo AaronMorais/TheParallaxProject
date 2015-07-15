@@ -83,25 +83,23 @@ public class Lego {
       ((LinkedHashMap)voxels.get(element.atom(0))).put("z", element.atom(1));
     }
 
-    Map voxelToBrick = new LinkedHashMap();
-    Expr voxelToBrickExpr = CompUtil.parseOneExpression_fromString(world, "Brick<:voxels");
-    itr = ((A4TupleSet)sol.eval(voxelToBrickExpr)).iterator();
-    while (itr.hasNext()) {
-      A4Tuple element = (A4Tuple)itr.next();
-      voxelToBrick.put(element.atom(1), element.atom(0));
-    }
-
-    LinkedList brickList = new LinkedList();
+    Map brickList = new LinkedHashMap();
     Expr brickExpr = CompUtil.parseOneExpression_fromString(world, "Brick");
     itr = ((A4TupleSet)sol.eval(brickExpr)).iterator();
     while (itr.hasNext()) {
       A4Tuple element = (A4Tuple)itr.next();
-      brickList.add(element.atom(0));
+      brickList.put(element.atom(0), new LinkedList());
+    }
+
+    Expr voxelToBrickExpr = CompUtil.parseOneExpression_fromString(world, "Brick<:voxels");
+    itr = ((A4TupleSet)sol.eval(voxelToBrickExpr)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      ((LinkedList)brickList.get(element.atom(0))).add(element.atom(1));
     }
 
     Map list = new LinkedHashMap();
     list.put("bricks", brickList);
-    list.put("voxelToBrick", voxelToBrick);
     list.put("voxels", voxels);
     StringWriter listOut = new StringWriter();
     JSONValue.writeJSONString(list, listOut);
