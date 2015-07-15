@@ -1,0 +1,50 @@
+<project name="parallax" default="jar" basedir=".">
+
+  <description>The Parallax Project</description>
+
+  <property name="build" location="build" />
+  <property name="src" location="src" />
+
+  <path id="libs.classpath">
+    <fileset dir="./lib">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+  <path id="build.classpath">
+    <path refid="libs.classpath" />
+  </path>
+  <path id="parallax.classpath">
+    <path refid="build.classpath" />
+    <pathelement path="${build}" />
+    <pathelement path="parallax.jar" />
+  </path>
+
+  <target name="init">
+    <tstamp />
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build}/log"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac includeantruntime="false" source="1.6" target="1.6" srcdir="${src}" destdir="${build}" classpathref="libs.classpath">
+      <compilerarg value="-Xlint:unchecked"/>
+    </javac>
+  </target>
+
+  <target name="jar" description="Create a jar file" depends="compile" >
+    <jar jarfile="parallax.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build}" />
+    <delete file="parallax.jar" />
+  </target>
+
+  <target name="test" description="Run test #1" depends="compile">
+    <java classname="Lego"
+      classpathref="parallax.classpath" failonerror="true">
+      <arg line="-model models/cube.model"/>
+    </java>
+  </target>
+
+</project>

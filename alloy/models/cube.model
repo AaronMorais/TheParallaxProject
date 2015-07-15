@@ -1,0 +1,11 @@
+--2x2x2
+abstract sig Voxel {}
+one sig A, B, C, D, E, F, G, H extends Voxel {}
+fun x[] : Voxel -> Int {
+  A -> 0 + B -> 0 + C -> 0+ D->0 + E->1 + F->1 + G->1 + H->1}
+fun y[] : Voxel -> Int {
+  A -> 0 + B->1 + C-> 0 + D->1 + E->0 + F->1 + G->0 + H->1}
+fun z[] : Voxel -> Int {
+  A -> 0 + B->0 + C-> 1 + D->1 + E->0 + F->0 + G->1 + H->1}
+fun colour[] : Voxel -> Colour {
+  A->Red + B->Blue + C->Red + D->Blue + E->Blue + F->Blue + G->Blue + H->Blue}
