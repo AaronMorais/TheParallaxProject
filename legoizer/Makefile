@@ -64,25 +64,11 @@ clean:
 	@echo "    Cleaning...";
 	@echo "    $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)"; $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)
 
-test: $(TEST_TARGET)
-
 run: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) $(ASSETS_DIR)/teapot.obj
+	$(PROJECT_TARGET) -f $(ASSETS_DIR)/teapot.obj -l
 
 run-tests: $(TEST_TARGET)
 	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
-
-run-test-cow: $(TEST_TARGET)
-	$(TEST_TARGET) $(ASSETS_DIR)/cow.obj
-
-run-test-teddy: $(TEST_TARGET)
-	$(TEST_TARGET) $(ASSETS_DIR)/teddy.obj
-
-run-test-teapot: $(TEST_TARGET)
-	$(TEST_TARGET) $(ASSETS_DIR)/teapot.obj
-
-run-dos2unix:
-	dos2unix
 
 .PHONY: all clean test run run-tests
 

@@ -41,7 +41,7 @@ Voxelizer::ShapeVoxelizer::ShapeVoxelizer(
     m_grid =
         std::vector<std::vector<std::vector<int>>>(m_dimensions.x,
         std::vector<std::vector<int>>(m_dimensions.y,
-        std::vector<int>(m_dimensions.z, -1)));
+        std::vector<int>(m_dimensions.z, Voxelizer::shouldFillShell ? -1 : 0)));
 }
 
 void
@@ -295,8 +295,8 @@ Voxelizer::ShapeVoxelizer::fillShell()
 void
 Voxelizer::ShapeVoxelizer::save()
 {
-    std::vector<glm::vec3> vertices = m_data->vertices();
-    std::vector<glm::vec3> faces = m_data->faces();
+    std::vector<glm::vec3>& vertices = m_data->vertices();
+    std::vector<glm::vec3>& faces = m_data->faces();
 
     for (size_t i = 0; i < m_grid.size(); ++i) {
 
@@ -304,7 +304,7 @@ Voxelizer::ShapeVoxelizer::save()
 
             for (size_t k = 0; k < m_grid[i][j].size(); ++k) {
 
-                if (m_grid[i][j][k] != 0) {
+                if (Voxelizer::shouldFillShell && m_grid[i][j][k] != 0)  {
 
                     float scale = Voxelizer::scale();
                     size_t last = vertices.size();

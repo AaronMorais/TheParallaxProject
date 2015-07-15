@@ -2,6 +2,7 @@
 #define _LEGO_DATA_H__
 
 #include "obj_data.h"
+#include <ostream>
 
 namespace plx {
 
@@ -12,6 +13,8 @@ public:
     std::vector<glm::vec3>& faces();
     std::vector<glm::vec3>& vertices();
     std::shared_ptr<tinyobj::ObjData> data();
+
+    void print(std::ostream& os);
 
 private:
     std::vector<glm::vec3> m_faces;

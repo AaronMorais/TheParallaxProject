@@ -18,10 +18,9 @@ public:
     const std::vector<tinyobj::shape_t>& shapes() const;
     const std::vector<tinyobj::material_t>& materials() const;
 
-    void PrintShapes() const;
-    void PrintMaterials() const;
-
-    void PrintObj(std::ostream& os) const;
+    void print() const;
+    void printShapes() const;
+    void printMaterials() const;
 
     class Factory {
     public:

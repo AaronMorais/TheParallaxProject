@@ -11,6 +11,9 @@ public:
     Legoizer(std::shared_ptr<plx::LegoData> data);
 
     void voxelize();
+
+    std::shared_ptr<plx::LegoData> data();
+
 private:
     std::shared_ptr<plx::LegoData> m_data;
 };

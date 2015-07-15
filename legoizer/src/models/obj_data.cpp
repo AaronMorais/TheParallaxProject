@@ -47,7 +47,14 @@ ObjData::Factory::Create(
 }
 
 void
-ObjData::PrintShapes() const
+ObjData::print() const
+{
+    printShapes();
+    printMaterials();
+}
+
+void
+ObjData::printShapes() const
 {
     const std::vector<tinyobj::shape_t>& shapes = this->shapes();
 
@@ -74,7 +81,7 @@ ObjData::PrintShapes() const
 }
 
 void
-ObjData::PrintMaterials() const
+ObjData::printMaterials() const
 {
     const std::vector<tinyobj::material_t>& materials = this->materials();
 
@@ -100,25 +107,6 @@ ObjData::PrintMaterials() const
             printf("  material.%s = %s\n", it->first.c_str(), it->second.c_str());
         }
         printf("\n");
-    }
-}
-
-void
-ObjData::PrintObj(
-    std::ostream& os
-    ) const
-{
-    for (const tinyobj::shape_t& shape : this->shapes())
-    {
-        os << "g" << std::endl;
-
-        for (const glm::vec3& vertex : shape.mesh.vertices) {
-            os << "v " << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
-        }
-
-        for (const glm::vec3& face : shape.mesh.faces) {
-            os << "f " << face.x << " " << face.y << " " << face.z << std::endl;
-        }
     }
 }
 
