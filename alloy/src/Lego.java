@@ -99,9 +99,18 @@ public class Lego {
       ((LinkedList)brickList.get(element.atom(0))).add(element.atom(1));
     }
 
+    Map brickColourList = new LinkedHashMap();
+    Expr brickColourExpr = CompUtil.parseOneExpression_fromString(world, "Brick<:colour");
+    itr = ((A4TupleSet)sol.eval(brickColourExpr)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      brickColourList.put(element.atom(0), element.atom(1));
+    }
+
     Map list = new LinkedHashMap();
     list.put("bricks", brickList);
     list.put("voxels", voxels);
+    list.put("colours", brickColourList);
     StringWriter listOut = new StringWriter();
     JSONValue.writeJSONString(list, listOut);
     String listJSON = listOut.toString();
