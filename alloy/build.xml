@@ -40,6 +40,16 @@
     <delete file="parallax.jar" />
   </target>
 
+  <target name="model" description="Run for a given model" depends="jar">
+    <property name="model" value="models/cube.model"/>
+    <echo message="Model= ${model}"/>
+    <java classname="Lego" maxmemory="1g" fork="true"
+      classpathref="parallax.classpath" failonerror="true">
+      <arg line="-model ${model}"/>
+    </java>
+  </target>
+
+
   <target name="cube" description="Run cube test" depends="jar">
     <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">

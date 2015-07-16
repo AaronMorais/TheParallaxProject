@@ -1,2 +1,0 @@
-apscheduler==3.0.2
-boto==2.32.1
