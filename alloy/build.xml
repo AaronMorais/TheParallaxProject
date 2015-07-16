@@ -40,10 +40,10 @@
     <delete file="parallax.jar" />
   </target>
 
-  <target name="test" description="Run cube test" depends="jar">
+  <target name="cube" description="Run cube test" depends="jar">
     <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
-      <arg line="-model models/teapot.model"/>
+      <arg line="-model models/cube.model"/>
     </java>
   </target>
 
