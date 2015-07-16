@@ -21,6 +21,19 @@ var HALF_GRID_SIZE = GRID_SIZE / 2;
 var GRID_DIVISIONS = 50;
 var GRID_UNIT_SIZE = GRID_SIZE / GRID_DIVISIONS;
 
+
+var VOXEL_WIDTH = 50;
+var VOXEL_HEIGHT = (50 * 3.2) / 15.9;
+var VOXEL_DEPTH = 50;
+
+var HALF_VOXEL_WIDTH = VOXEL_WIDTH / 2;
+var HALF_VOXEL_HEIGHT = VOXEL_HEIGHT / 2;
+var HALF_VOXEL_DEPTH = VOXEL_DEPTH / 2;
+
+var CYLINDER_HEIGHT = 10.89;
+var CYLINDER_RADIUS = 15.38;
+
+
 init();
 animate();
 
@@ -95,28 +108,26 @@ function getClosestPointToOrigin(voxelMap, voxelKeys) {
     return closestPoint;
 }
 
+function getRenderVoxelLocation(unitVoxel) {
+    return { x: unitVoxel.x * VOXEL_WIDTH + HALF_VOXEL_WIDTH,
+             y: unitVoxel.y * VOXEL_HEIGHT + HALF_VOXEL_HEIGHT,
+             z: unitVoxel.z * VOXEL_DEPTH + HALF_VOXEL_DEPTH };
+}
+
 function getOneByOne(location, material) {
-    var voxelWidth = 50;
-    var voxelHeight = (50 * 3.2) / 15.9;
-    var voxelDepth = 50;
+    
+    var renderLocation = getRenderVoxelLocation(location);
 
-    var cylinderHeight = 10.89;
-    var cylinderRadius = 15.38;
-    var renderLocation = {};
-    renderLocation.x = location.x * voxelWidth + ( voxelWidth / 2 );
-    renderLocation.y = location.y * voxelHeight + ( voxelHeight / 2 );
-    renderLocation.z = location.z * voxelDepth + (voxelDepth / 2);
+    var voxelGeometry = new THREE.BoxGeometry(VOXEL_WIDTH,
+                                              VOXEL_HEIGHT,
+                                              VOXEL_DEPTH);
 
-    var voxelGeometry = new THREE.BoxGeometry(voxelWidth,
-                                              voxelHeight,
-                                              voxelDepth);
-
-    var voxelCylinder = new THREE.CylinderGeometry(cylinderRadius,
-                                                   cylinderRadius,
-                                                   cylinderHeight);
+    var voxelCylinder = new THREE.CylinderGeometry(CYLINDER_RADIUS,
+                                                   CYLINDER_RADIUS,
+                                                   CYLINDER_HEIGHT);
     // Moving the cylinder up above the voxel
     $.each(voxelCylinder.vertices, function(i, vertex) {
-        vertex.y += (voxelHeight/2);
+        vertex.y += (VOXEL_HEIGHT/2);
     });
 
     voxelGeometry.merge(voxelCylinder);
@@ -130,12 +141,162 @@ function getOneByOne(location, material) {
 }
 
 
-function addVoxels(scene) {
+// We have to use the brick and not the geometry itself
+// because the geometry has faces and the cylinder
+// which makes it more complicated
+var ORIGINAL_VOXEL_VERTICES = [
+    // Top 4 vertices
+    new THREE.Vector3(-HALF_VOXEL_WIDTH, HALF_VOXEL_HEIGHT, HALF_VOXEL_DEPTH),
+    new THREE.Vector3(HALF_VOXEL_WIDTH, HALF_VOXEL_HEIGHT, HALF_VOXEL_DEPTH),
+    new THREE.Vector3(HALF_VOXEL_WIDTH, HALF_VOXEL_HEIGHT, -HALF_VOXEL_DEPTH),
+    new THREE.Vector3(-HALF_VOXEL_WIDTH, HALF_VOXEL_HEIGHT, -HALF_VOXEL_DEPTH),
+    
+    // Bottom 4 vertices in same order
+    new THREE.Vector3(-HALF_VOXEL_WIDTH, -HALF_VOXEL_HEIGHT, HALF_VOXEL_DEPTH),
+    new THREE.Vector3(HALF_VOXEL_WIDTH, -HALF_VOXEL_HEIGHT, HALF_VOXEL_DEPTH),
+    new THREE.Vector3(HALF_VOXEL_WIDTH, -HALF_VOXEL_HEIGHT, -HALF_VOXEL_DEPTH),
+    new THREE.Vector3(-HALF_VOXEL_WIDTH, -HALF_VOXEL_HEIGHT, -HALF_VOXEL_DEPTH),
+];
+
+function swapVector(a, b) {
+    var c = { x: a.x, 
+              y: a.y, 
+              z: a.z };
+    a.x = b.x;
+    a.y = b.y;
+    a.z = b.z;
+    
+    b.x = c.x;
+    b.y = c.y;
+    b.z = c.z;
+}
+
+function lineSegmentHashKey(lineSegment) {
+    var p0 = lineSegment.p0;
+    var p1 = lineSegment.p1;
+
+    // This is so that (a, b) and (b, a) hash to the same value
+    if( p0.x == p1.x ) { // sort by y's 
+        if( p0.y == p1.y ) { // sort by z's
+            if( p1.z < p0.z ) {
+                swapVector(p0, p1);
+            }
+        } else if( p1.y < p0.y ) {
+            swapVector(p0, p1);    
+        }
+    }  else if( p1.x < p0.x ){ // sort by x's
+        swapVector(p0, p1);
+    }
+
+    return ( p0.x.toString() + "," +
+             p0.y.toString() + "," +
+             p0.z.toString() + " " +
+             p1.x.toString() + "," +
+             p1.y.toString() + "," +
+             p1.z.toString() );
+}
+
+function addVector(dst, v0, v1) {
+    dst.x = parseFloat(v0.x) + parseFloat(v1.x);
+    dst.y = parseFloat(v0.y) + parseFloat(v1.y);
+    dst.z = parseFloat(v0.z) + parseFloat(v1.z);
+}
+
+function copyVector(dst, src) {
+    dst.x = src.x;
+    dst.y = src.y;
+    dst.z = src.z;
+}
+
+function addToIfNotInMap(element, map, hashFunc) {
+    
+    if( map[hashFunc(element)] != undefined ) {
+        map[hashFunc(element)].count++;
+        return;
+    }
+
+    map[hashFunc(element)] = {};
+    map[hashFunc(element)].line = element;
+    map[hashFunc(element)].count = 1;
+}
+
+function getOutline(brick, voxelMap) {
+    var duplicateMap = {};
+
+    var outlineGeometry = new THREE.Geometry();
+    var lineSegments = [];
+
+    var halfVoxelVertices = ORIGINAL_VOXEL_VERTICES.length / 2;
+
+    $.each(brick, function(i, voxelKey) {
+        var unitVoxelLocation = voxelMap[voxelKey];
+        var voxelLocation = getRenderVoxelLocation(unitVoxelLocation);
+        // console.log(voxelLocation);
+        for( var i = 0; i < halfVoxelVertices; i++ ) {
+            // Top lines
+            var topLine = {};
+            topLine.p0 = {};
+            topLine.p1 = {};
+            copyVector(topLine.p0, ORIGINAL_VOXEL_VERTICES[i]);
+            if( i == halfVoxelVertices - 1)
+                copyVector(topLine.p1, ORIGINAL_VOXEL_VERTICES[0]);
+            else
+                copyVector(topLine.p1, ORIGINAL_VOXEL_VERTICES[i+1]);
+
+            // Bottom lines
+            var bottomLine = {};
+            bottomLine.p0 = {};
+            bottomLine.p1 = {};
+            copyVector(bottomLine.p0, ORIGINAL_VOXEL_VERTICES[halfVoxelVertices+i]);
+            if( i == halfVoxelVertices - 1)
+                copyVector(bottomLine.p1, ORIGINAL_VOXEL_VERTICES[halfVoxelVertices]);
+            else
+                copyVector(bottomLine.p1, ORIGINAL_VOXEL_VERTICES[halfVoxelVertices+i+1]);
+
+            // Side lines
+            var sideLine = {};
+            sideLine.p0 = {};
+            sideLine.p1 = {};
+            copyVector(sideLine.p0, ORIGINAL_VOXEL_VERTICES[i]);
+            copyVector(sideLine.p1, ORIGINAL_VOXEL_VERTICES[halfVoxelVertices+i]);
+
+            addVector(topLine.p0, voxelLocation, topLine.p0);
+            addVector(topLine.p1, voxelLocation, topLine.p1);
+            addVector(bottomLine.p0, voxelLocation, bottomLine.p0);
+            addVector(bottomLine.p1, voxelLocation, bottomLine.p1);
+            addVector(sideLine.p0, voxelLocation, sideLine.p0);
+            addVector(sideLine.p1, voxelLocation, sideLine.p1);
+
+            addToIfNotInMap(topLine, duplicateMap, lineSegmentHashKey);
+            addToIfNotInMap(bottomLine, duplicateMap, lineSegmentHashKey);
+            addToIfNotInMap(sideLine, duplicateMap, lineSegmentHashKey);
+        } 
+    });
+   
+
+    $.each(duplicateMap, function(key, value) {
+        if( value.count == 1 ) {
+            outlineGeometry.vertices.push(value.line.p0);
+            outlineGeometry.vertices.push(value.line.p1);    
+        }
+    });
+
+    var line = new THREE.Line(outlineGeometry, 
+                              new THREE.LineBasicMaterial( 
+                                    { color: 0xffffff,
+                                      linewidth: GRID_CENTER_WIDTH } ),
+                              THREE.LinePieces
+                             );
+    return line;
+}
+
+function addVoxels(scene, withOutline) {
+
     $.getJSON("lego.json" , function(result) {
-        $.each(result["bricks"], function(key, value) {
+        $.each(result["bricks"], function(key, brick) {
             colour = colourNameToHex(result["colours"][key].split("$")[0]);
             brickMaterial = new THREE.MeshLambertMaterial( { color : colour } );
-            $.each(value, function(i, voxelKey) {
+            $.each(brick, function(i, voxelKey) {
                 var voxelLocation = result["voxels"][voxelKey];
                 cube = getOneByOne( voxelLocation, brickMaterial );
                 cube.brickKey = key;
@@ -147,6 +308,9 @@ function addVoxels(scene) {
                 scene.add(cube);
                 visibleBricks.push(cube);
             });
+
+            var brickOutline = getOutline(brick, result["voxels"]);
+            scene.add(brickOutline)
         });
     });
 }
@@ -228,7 +392,7 @@ function init() {
     window.scene.add( directionalLight );
 
     var directionalLight2 = new THREE.DirectionalLight( 0xffffff );
-    directionalLight2.position.set( 0, -1000, 0 );
+    directionalLight2.position.set( -1000, -1000, 0 );
     window.scene.add( directionalLight2 );
 
     var spotLight = new THREE.SpotLight( 0xffffff, 1.0 );
@@ -246,6 +410,14 @@ function init() {
     spotLight.shadowMapHeight = 2048;
 
     scene.add( spotLight );
+
+    var spotLight2 = new THREE.SpotLight( 0xffffff, 1.0 );
+    spotLight2.position.set( -500, 500, 2000 );
+    scene.add( spotLight2 );
+
+    var spotLight3 = new THREE.SpotLight( 0xffffff, 1.0 );
+    spotLight3.position.set( -500, 500, -2000 );
+    scene.add( spotLight3 );
 
     // renderer
     renderer = new THREE.WebGLRenderer();
