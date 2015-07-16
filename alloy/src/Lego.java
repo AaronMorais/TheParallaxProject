@@ -14,6 +14,7 @@ import java.util.Map;
 import org.json.simple.JSONValue;
 import java.io.PrintWriter;
 import java.lang.Thread;
+import java.util.Scanner;
 
 import edu.mit.csail.sdg.alloy4.A4Reporter;
 import edu.mit.csail.sdg.alloy4.XMLNode;
@@ -53,10 +54,28 @@ public class Lego {
     opt.solver = A4Options.SatSolver.SAT4J;
     Command cmd = world.getAllCommands().get(0);
     A4Solution sol = TranslateAlloyToKodkod.execute_commandFromBook(rep, world.getAllReachableSigs(), cmd, opt);
-    assert sol.satisfiable();
-    sol.writeXML(output_xml_file_name);
 
-    // Parsing the solution
+    // Output through the solutions
+    assert sol.satisfiable();
+    int solution_count = 1;
+    while (sol.satisfiable()) {
+      sol.writeXML(output_xml_file_name);
+      output_solution_json(world, sol);
+      System.out.println("Solution #" + String.valueOf(solution_count) + " generated. Press enter for next solution.");
+      Scanner keyboard = new Scanner(System.in);
+      keyboard.nextLine();
+
+      A4Solution nextSolution = sol.next();
+      if (nextSolution == sol) {
+        System.out.println("No additional solutions found.");
+        break;
+      }
+      sol = nextSolution;
+      solution_count += 1;
+    }
+  }
+
+  private static void output_solution_json(Module world, A4Solution sol) throws Exception {
     Map voxels = new LinkedHashMap();
     Expr xVoxel = CompUtil.parseOneExpression_fromString(world, "Voxel<:x");
     Iterator<A4Tuple> itr = ((A4TupleSet)sol.eval(xVoxel)).iterator();
@@ -118,12 +137,6 @@ public class Lego {
     PrintWriter out = new PrintWriter(output_json_file_name);
     out.println(listJSON);
     out.close();
-
-    System.out.println("Displaying result at localhost:3000");
-    Process p = Runtime.getRuntime().exec("python -m SimpleHTTPServer 3000");
-    Process p2 = Runtime.getRuntime().exec("open localhost:3000");
-    p2.waitFor();
-    p.waitFor();
   }
 
   private static void flushModelToFile(String model, File tmpAls) throws IOException {
