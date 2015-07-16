@@ -41,14 +41,14 @@
   </target>
 
   <target name="test" description="Run cube test" depends="compile">
-    <java classname="Lego"
+    <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
-      <arg line="-model models/cube.model"/>
+      <arg line="-model models/teapot.model"/>
     </java>
   </target>
 
   <target name="pyramid" description="Run pyramid test" depends="compile">
-    <java classname="Lego"
+    <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
       <arg line="-model models/pyramid.model"/>
     </java>
