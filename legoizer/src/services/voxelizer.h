@@ -19,14 +19,6 @@ public:
         return 1.230769;
     }
 
-    static constexpr int subdivisions() {
-        return 40;
-    }
-
-    static constexpr bool shouldFillShell() {
-        return true;
-    }
-
     class ShapeVoxelizer {
     public:
         ShapeVoxelizer(std::shared_ptr<plx::LegoData> data, const tinyobj::shape_t& shape);
@@ -38,8 +30,8 @@ public:
         const tinyobj::shape_t& m_shape;
 
         static std::tuple<glm::vec3, glm::vec3> calculateMinMaxDimensions(const std::vector<glm::vec3>& faces, const std::vector<glm::vec3>& vertices);
-        static float calculateVoxelUnit(glm::vec3& min, glm::vec3& max);
-        static glm::vec3 calculateVoxelGridDimensions(glm::vec3& min, glm::vec3& max, float voxel_unit);
+        static float calculateVoxelUnit(const glm::vec3& min, const glm::vec3& max);
+        static glm::vec3 calculateVoxelGridDimensions(const glm::vec3& min, const glm::vec3& max, const float& voxel_unit);
 
         bool arePointsClose(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
         bool arePointsOnOccupiedVoxel(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);

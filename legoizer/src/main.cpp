@@ -10,12 +10,14 @@ void printError(
     char** argv
     )
 {
-    std::cerr << "Expected input: " << argv[0] << "-f <file_name> [-m <materials path>] [-v] [-o <outfile>]"  << std::endl;
-    std::cerr << "-f    .obj file" << std::endl;
-    std::cerr << "-o    output file (if none, to cout)" << std::endl;
-    std::cerr << "-m    materials path for .obj " << std::endl;
-    std::cerr << "-l    should voxelize .obj input" << std::endl;
-    std::cerr << "-i    print .obj information" << std::endl;
+    std::cerr << "Expected input: " << argv[0] << " -File <file_name>"  << std::endl;
+    std::cerr << "-File <filename>      input file in .obj" << std::endl;
+    std::cerr << "-Output <filename>    output file (if none, to cout)" << std::endl;
+    std::cerr << "-Materials <filepath> materials path for input .obj " << std::endl;
+    std::cerr << "-voxelize             voxelize .obj input" << std::endl;
+    std::cerr << "-alloy                output as alloy model (default obj)" << std::endl;
+    std::cerr << "-subdivisions <int>   number of subdivisions" << std::endl;
+    std::cerr << "-fill                 fill the voxel model" << std::endl;
 }
 
 int
@@ -31,25 +33,29 @@ main(
     }
 
     bool should_legoize = false;
-    bool should_print_obj_info = false;
+    bool should_print_alloy = false;
 
     std::string file_name;
     std::string model_path;
     std::ostream* os = &std::cout;
 
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-f") == 0 && (i+1 < argc)) {
+        if (strcmp(argv[i], "-File") == 0 && (i+1 < argc)) {
             file_name = argv[i+1]; i+=1;
-        } else if (strcmp(argv[i], "-o") == 0 && (i+1 < argc)) {
+        } else if (strcmp(argv[i], "-Output") == 0 && (i+1 < argc)) {
             std::string outfile = argv[i+1]; i+=1;
-            std::ofstream ofs(outfile.c_str());
-            os = &ofs;
-        } else if (strcmp(argv[i], "-m") == 0 && (i+1 < argc)) {
+            std::ofstream* ofs = new std::ofstream(outfile.c_str());
+            os = ofs;
+        } else if (strcmp(argv[i], "-Materials") == 0 && (i+1 < argc)) {
             model_path = argv[i+1]; i+=1;
-        } else if (strcmp(argv[i], "-l") == 0) {
+        } else if (strcmp(argv[i], "-voxelize") == 0) {
             should_legoize = true;
-        } else if (strcmp(argv[i], "-i") == 0) {
-            should_print_obj_info = true;
+        } else if (strcmp(argv[i], "-alloy") == 0) {
+            should_print_alloy = true;
+        } else if (strcmp(argv[i], "-fill") == 0) {
+            plx::Legoizer::shouldFillShell = true;
+        } else if (strcmp(argv[i], "-subdivisions") == 0 && (i+1 < argc)) {
+            plx::Legoizer::subdivisions = atoi(argv[i+1]);
         }
     }
 
@@ -69,19 +75,21 @@ main(
     std::shared_ptr<plx::LegoData> lego_data = std::make_shared<plx::LegoData>(obj_data);
     std::shared_ptr<plx::Legoizer> legoizer = std::make_shared<plx::Legoizer>(lego_data);
 
-    if (should_print_obj_info) {
-        legoizer->data()->data()->print();
-    }
-
     if (should_legoize) {
         legoizer->voxelize();
     }
 
-    legoizer->data()->print(*os);
+    if (should_print_alloy) {
+        lego_data->printAlloy(*os);
+    } else {
+        lego_data->printObj(*os);
+    }
 
-    std::cout << "Completed" << std::endl;
+    std::cerr << "Completed" << std::endl;
 
-    if (os == &std::cout) {
+    if (os != &std::cout) {
+        delete os;
+    } else {
         os = nullptr;
     }
 

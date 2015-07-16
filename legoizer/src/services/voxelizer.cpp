@@ -41,7 +41,7 @@ Voxelizer::ShapeVoxelizer::ShapeVoxelizer(
     m_grid =
         std::vector<std::vector<std::vector<int>>>(m_dimensions.x,
         std::vector<std::vector<int>>(m_dimensions.y,
-        std::vector<int>(m_dimensions.z, Voxelizer::shouldFillShell ? -1 : 0)));
+        std::vector<int>(m_dimensions.z, Legoizer::shouldFillShell ? -1 : 0)));
 }
 
 void
@@ -62,7 +62,7 @@ Voxelizer::ShapeVoxelizer::voxelize()
         voxelize(x, y, z);
     }
 
-    if (Voxelizer::shouldFillShell()) {
+    if (Legoizer::shouldFillShell) {
         fillShell();
     }
 
@@ -74,7 +74,9 @@ Voxelizer::ShapeVoxelizer::voxelize()
 }
 
 std::tuple<glm::vec3, glm::vec3>
-Voxelizer::ShapeVoxelizer::calculateMinMaxDimensions(const std::vector<glm::vec3>& faces, const std::vector<glm::vec3>& vertices)
+Voxelizer::ShapeVoxelizer::calculateMinMaxDimensions(
+    const std::vector<glm::vec3>& faces,
+    const std::vector<glm::vec3>& vertices)
 {
     glm::vec3 min(INT_MAX, INT_MAX, INT_MAX);
     glm::vec3 max(INT_MIN, INT_MIN, INT_MIN);
@@ -115,21 +117,21 @@ Voxelizer::ShapeVoxelizer::calculateMinMaxDimensions(const std::vector<glm::vec3
 
 float
 Voxelizer::ShapeVoxelizer::calculateVoxelUnit(
-    glm::vec3& min,
-    glm::vec3& max
+    const glm::vec3& min,
+    const glm::vec3& max
     )
 {
     float minimum_side = std::min(std::min((max.x - min.x), (max.y - min.y)), (max.z - min.z));
-    float voxel_unit = minimum_side / Voxelizer::subdivisions();
+    float voxel_unit = minimum_side / Legoizer::subdivisions;
     std::cerr << "voxel_unit: " << voxel_unit << std::endl;
     return voxel_unit;
 }
 
 glm::vec3
 Voxelizer::ShapeVoxelizer::calculateVoxelGridDimensions(
-    glm::vec3& min,
-    glm::vec3& max,
-    float voxel_unit
+    const glm::vec3& min,
+    const glm::vec3& max,
+    const float& voxel_unit
     )
 {
     float width = std::ceil((max.x - min.x) / voxel_unit) + 1;
@@ -153,7 +155,6 @@ bool Voxelizer::ShapeVoxelizer::arePointsClose(
             std::abs((size_t)v2.z - (size_t)v3.z) < 2;
 }
 
-
 bool Voxelizer::ShapeVoxelizer::arePointsOnOccupiedVoxel(
     glm::vec3& v1,
     glm::vec3& v2,
@@ -164,7 +165,6 @@ bool Voxelizer::ShapeVoxelizer::arePointsOnOccupiedVoxel(
             m_grid[(size_t)v2.x][(size_t)v2.y][(size_t)v2.z] == 1 &&
             m_grid[(size_t)v3.x][(size_t)v3.y][(size_t)v3.z] == 1;
 }
-
 
 void Voxelizer::ShapeVoxelizer::voxelize(
     glm::vec3& v1,
@@ -206,7 +206,6 @@ void Voxelizer::ShapeVoxelizer::voxelize(
     voxelize(mid3, mid2, v3);
     voxelize(mid1, mid2, mid3);
 }
-
 
 void
 Voxelizer::ShapeVoxelizer::fillShell()
@@ -297,6 +296,7 @@ Voxelizer::ShapeVoxelizer::save()
 {
     std::vector<glm::vec3>& vertices = m_data->vertices();
     std::vector<glm::vec3>& faces = m_data->faces();
+    std::vector<glm::vec3>& voxels = m_data->voxels();
 
     for (size_t i = 0; i < m_grid.size(); ++i) {
 
@@ -304,7 +304,9 @@ Voxelizer::ShapeVoxelizer::save()
 
             for (size_t k = 0; k < m_grid[i][j].size(); ++k) {
 
-                if (Voxelizer::shouldFillShell && m_grid[i][j][k] != 0)  {
+                if (Legoizer::shouldFillShell && m_grid[i][j][k] != 0)  {
+
+                    voxels.push_back(glm::vec3(i,j,k));
 
                     float scale = Voxelizer::scale();
                     size_t last = vertices.size();

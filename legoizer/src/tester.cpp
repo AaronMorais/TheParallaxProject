@@ -31,7 +31,7 @@ main(
 
     ObjViewer::GetInstance().Run();
 
-    std::cout << "Test Completed" << std::endl;
+    std::cerr << "Test Completed" << std::endl;
 
     return 0;
 }
