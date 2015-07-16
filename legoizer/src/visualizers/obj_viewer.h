@@ -6,13 +6,14 @@
 #define GLFW_DLL
 
 #include "obj_data.h"
+#include "lego_data.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 class ObjViewer {
 public:
-    void SetData(std::shared_ptr<ObjData> data);
+    void SetData(std::shared_ptr<plx::LegoData> data);
     void Run();
     static ObjViewer& GetInstance();
 
@@ -55,7 +56,7 @@ private:
 
 
     volatile bool m_dataChanged;
-    std::shared_ptr<ObjData> m_data;
+    std::shared_ptr<plx::LegoData> m_data;
 
     ObjViewer();
     ObjViewer(ObjViewer const&) = delete;

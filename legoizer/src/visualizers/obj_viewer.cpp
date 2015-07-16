@@ -18,7 +18,7 @@ ObjViewer::GetInstance()
 
 void
 ObjViewer::SetData(
-    std::shared_ptr<ObjData> data
+    std::shared_ptr<plx::LegoData> data
 )
 {
     m_data = data;
@@ -309,42 +309,39 @@ ObjViewer::Render()
     glScalef(m_scale, m_scale, m_scale);
 
 
-    auto shapes = m_data->shapes();
+    const std::vector<glm::vec3>& faces = m_data->faces();
+    const std::vector<glm::vec3>& vertices = m_data->vertices();
 
     glPushMatrix();
     glRotatef(m_horizontalAngle, 0, 1, 0);
     glRotatef(m_verticalAngle, 1, 0, 0);
-    for (size_t i = 0; i < shapes->size(); ++i)
+
+    for (size_t f = 0; f < faces.size(); ++f)
     {
-        tinyobj::mesh_t& mesh = (*shapes)[i].mesh;
-        for (size_t f = 0; f < mesh.faces.size(); ++f)
-        {
-            glBegin(GL_TRIANGLES);
+        glBegin(GL_TRIANGLES);
 
-            glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
-            glVertex3f(
-                mesh.vertices[mesh.faces[f].v1].x,
-                mesh.vertices[mesh.faces[f].v1].y,
-                mesh.vertices[mesh.faces[f].v1].z
-            );
+        glColor3f((float)f/faces.size(), (float)f/faces.size(), (float)f/faces.size());
+        glVertex3f(
+            vertices[faces[f].x].x,
+            vertices[faces[f].x].y,
+            vertices[faces[f].x].z
+        );
 
-            glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
-            glVertex3f(
-                mesh.vertices[mesh.faces[f].v2].x,
-                mesh.vertices[mesh.faces[f].v2].y,
-                mesh.vertices[mesh.faces[f].v2].z
-            );
+        glColor3f((float)f/faces.size(), (float)f/faces.size(), (float)f/faces.size());
+        glVertex3f(
+            vertices[faces[f].y].x,
+            vertices[faces[f].y].y,
+            vertices[faces[f].y].z
+        );
 
-            glColor3f((float)f/mesh.faces.size(), (float)f/mesh.faces.size(), (float)f/mesh.faces.size());
-            glVertex3f(
-                mesh.vertices[mesh.faces[f].v3].x,
-                mesh.vertices[mesh.faces[f].v3].y,
-                mesh.vertices[mesh.faces[f].v3].z
-            );
+        glColor3f((float)f/faces.size(), (float)f/faces.size(), (float)f/faces.size());
+        glVertex3f(
+            vertices[faces[f].z].x,
+            vertices[faces[f].z].y,
+            vertices[faces[f].z].z
+        );
 
-            glEnd();
-        }
-
+        glEnd();
     }
 
     glPopMatrix();
@@ -362,6 +359,6 @@ ObjViewer::ObjViewer() :
 
     m_horizontalAngle = 3.14f;
     m_verticalAngle = 0.0f;
-    m_speed = 1.0f;
+    m_speed = 0.2f;
     m_mouseSpeed = 0.005f;
 }
