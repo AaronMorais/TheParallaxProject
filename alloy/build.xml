@@ -40,24 +40,38 @@
     <delete file="parallax.jar" />
   </target>
 
-  <target name="test" description="Run cube test" depends="compile">
+  <target name="test" description="Run cube test" depends="jar">
     <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
       <arg line="-model models/teapot.model"/>
     </java>
   </target>
 
-  <target name="pyramid" description="Run pyramid test" depends="compile">
+  <target name="pyramid" description="Run pyramid test" depends="jar">
     <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
       <arg line="-model models/pyramid.model"/>
     </java>
   </target>
 
-  <target name="lblock" description="Run L-Block test" depends="compile">
+  <target name="lblock" description="Run L-Block test" depends="jar">
     <java classname="Lego"
       classpathref="parallax.classpath" failonerror="true">
       <arg line="-model models/l-block.model"/>
+    </java>
+  </target>
+
+  <target name="line" description="Run line test" depends="jar">
+    <java classname="Lego"
+      classpathref="parallax.classpath" failonerror="true">
+      <arg line="-model models/line.model"/>
+    </java>
+  </target>
+
+  <target name="teapot" description="Run teapot test" depends="jar">
+    <java classname="Lego" maxmemory="2g" fork="true"
+      classpathref="parallax.classpath" failonerror="true">
+      <arg line="-model models/teapot.model"/>
     </java>
   </target>
 
