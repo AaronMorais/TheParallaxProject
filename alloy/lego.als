@@ -44,8 +44,8 @@ fun inventory[] : Brick -> Int {
 	OneOne->10 + OneTwo->10 + OneThree->10 + OneFour->10 +
 		TwoTwo->10 + LBlock->10 + TwoThree->10 + TwoFour->10 +
 		OneOnePlate->10 + OneTwoPlate->10 + OneThreePlate->10 + OneFourPlate->10 +
-		LPlate->10 + TwoTwoPlate->0 + TwoThreePlate->0 + TwoFourPlate->10 +
-		ThreeThreePlate -> 0}
+		LPlate->10 + TwoTwoPlate->10 + TwoThreePlate->10 + TwoFourPlate->10 +
+		ThreeThreePlate -> 10}
 
 abstract sig Colour {}
 one sig Red, Blue, Yellow extends Colour {}
@@ -96,12 +96,12 @@ fact WellPlaced {
 	all b : Brick | b.*connected = Brick
 	-- Bricks are only as long and wide as the brick type allows
 	all b : Brick | all v : b.voxels |
-		 (#(v.*(b.voxels <: xAdjacent :> b.voxels)) <= b.length and
-			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) <= b.width) or
- 		(#(v.*(b.voxels <: xAdjacent :> b.voxels)) <= b.width and
-			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) <= b.length)
+		 (#(v.*(b.voxels <: xAdjacent :> b.voxels)) = b.length and
+			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) = b.width) or
+ 		(#(v.*(b.voxels <: xAdjacent :> b.voxels)) = b.width and
+			 #(v.*(b.voxels <: zAdjacent :> b.voxels)) = b.length)
  	-- Each voxel in the brick must be the same colour as the brick
-	-- all b : Brick | all v : b.voxels | v.colour = b.colour
+	all b : Brick | all v : b.voxels | v.colour = b.colour
 	--	Each brick is only as tall as brick allows
 	all b : Brick | all v : b.voxels |
 		 #(v.*(b.voxels <: yAdjacent :> b.voxels)) <= b.height
