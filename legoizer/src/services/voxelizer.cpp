@@ -2,7 +2,7 @@
 #include "legoizer.h"
 #include "utilities/glm_helpers.h"
 
-#include <math.h>
+#include <cstdlib>
 #include <iostream>
 #include <algorithm>
 
@@ -147,12 +147,12 @@ bool Voxelizer::ShapeVoxelizer::arePointsClose(
     glm::vec3& v3
     )
 {
-    return  std::abs((size_t)v1.x - (size_t)v2.x) < 2 &&
-            std::abs((size_t)v2.x - (size_t)v3.x) < 2 &&
-            std::abs((size_t)v1.y - (size_t)v2.y) < 2 &&
-            std::abs((size_t)v2.y - (size_t)v3.y) < 2 &&
-            std::abs((size_t)v1.z - (size_t)v2.z) < 2 &&
-            std::abs((size_t)v2.z - (size_t)v3.z) < 2;
+    return  std::abs((int)((size_t)v1.x - (size_t)v2.x)) < 2 &&
+            std::abs((int)((size_t)v2.x - (size_t)v3.x)) < 2 &&
+            std::abs((int)((size_t)v1.y - (size_t)v2.y)) < 2 &&
+            std::abs((int)((size_t)v2.y - (size_t)v3.y)) < 2 &&
+            std::abs((int)((size_t)v1.z - (size_t)v2.z)) < 2 &&
+            std::abs((int)((size_t)v2.z - (size_t)v3.z)) < 2;
 }
 
 bool Voxelizer::ShapeVoxelizer::arePointsOnOccupiedVoxel(

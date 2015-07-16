@@ -56,6 +56,7 @@ public class Lego {
     assert sol.satisfiable();
     sol.writeXML(output_xml_file_name);
 
+    // Parsing the solution
     Map voxels = new LinkedHashMap();
     Expr xVoxel = CompUtil.parseOneExpression_fromString(world, "Voxel<:x");
     Iterator<A4Tuple> itr = ((A4TupleSet)sol.eval(xVoxel)).iterator();
