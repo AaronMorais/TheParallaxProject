@@ -3,7 +3,7 @@
 # Alloy
 Generates solutions based on our "lego.als" file and a provided alloy voxel model. Example models are available in the "models" folder.
 
-Results are outputted to "lego.xml" and "lego.json". To view the result, start a simple web server in the alloy directory and open the index.html file.
+Results are outputted to "lego.xml" and "lego.json". To view the result, start a simple web server in the alloy directory and open the "index.html" file.
 
 Available Tests:
 ```
