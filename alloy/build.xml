@@ -79,7 +79,7 @@
   </target>
 
   <target name="teapot" description="Run teapot test" depends="jar">
-    <java classname="Lego" maxmemory="2g" fork="true"
+    <java classname="Lego" maxmemory="4g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
       <arg line="-model models/teapot.model"/>
     </java>

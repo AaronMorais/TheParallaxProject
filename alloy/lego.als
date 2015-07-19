@@ -2,6 +2,31 @@ abstract sig Brick {
 	voxels : set Voxel,
 	colour : one Colour
 }
+
+sig OneOne, OneTwo, OneThree, OneFour, TwoTwo, LBrick, TwoThree, TwoFour,
+	OneOnePlate, OneTwoPlate, OneThreePlate, OneFourPlate, LPlate,
+	TwoTwoPlate, TwoThreePlate, TwoFourPlate, ThreeThreePlate extends Brick {}
+fun length[] : Brick -> Int {
+		OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 + TwoTwo->2 + LBrick->2 + TwoThree->2 + TwoFour->2 +
+		OneOnePlate->1 + OneTwoPlate->2 + OneThreePlate->3 + OneFourPlate->4 + LPlate->2 +
+		TwoTwoPlate->2 + TwoThreePlate->2 + TwoFourPlate->2 + ThreeThreePlate -> 3}
+fun width[] : Brick -> Int {
+		OneOne->1 + OneTwo->1 + OneThree->1 + OneFour->1 + TwoTwo->2 + LBrick->2 + TwoThree->3 + TwoFour->4 +
+		OneOnePlate->1 + OneTwoPlate->1 + OneThreePlate->1 + OneFourPlate->1 + LPlate->2 +
+		TwoTwoPlate->2 + TwoThreePlate->3 + TwoFourPlate->4 + ThreeThreePlate -> 3}
+fun height[] : Brick -> Int {
+		OneOne->3 + OneTwo->3 + OneThree->3 + OneFour->3 + TwoTwo->3 + LBrick->3 + TwoThree->3 + TwoFour->3 +
+		OneOnePlate->1 + OneTwoPlate->1 + OneThreePlate->1 + OneFourPlate->1 + LPlate->1 +
+		TwoTwoPlate->1 + TwoThreePlate->1 + TwoFourPlate->1 + ThreeThreePlate -> 1}
+fun volume[] : Brick -> Int {
+		OneOne->3 + OneTwo->6 + OneThree->9 + OneFour->12 + TwoTwo->12 + LBrick->9 + TwoThree->18 + TwoFour->24 +
+		OneOnePlate->1 + OneTwoPlate->2 + OneThreePlate->3 + OneFourPlate->4 + LPlate->3 +
+		TwoTwoPlate->4 + TwoThreePlate->6 + TwoFourPlate->8 + ThreeThreePlate -> 9}
+fun inventory[] : Brick -> Int {
+		OneOne->10 + OneTwo->10 + OneThree->10 + OneFour->10 + TwoTwo->10 + LBrick->10 + TwoThree->10 + TwoFour->10 +
+		OneOnePlate->10 + OneTwoPlate->10 + OneThreePlate->10 + OneFourPlate->10 + LPlate->10 +
+		TwoTwoPlate->10 + TwoThreePlate->10 + TwoFourPlate->10 + ThreeThreePlate -> 10}
+
 -- a set comprehension to tell us which bricks are connected to which others
 fun connected[] : Brick->Brick {
 	{b1, b2 : Brick | connected[b1,b2] && b1 != b2 }
@@ -13,42 +38,6 @@ pred connected[b1, b2 : one Brick] {
 	some v1 : b1.voxels |
 			some v2 : b2.voxels | aboveOrBelow[v1, v2]
 }
-sig OneOne, OneTwo, OneThree, OneFour, TwoTwo, LBlock, TwoThree, TwoFour,
-	OneOnePlate, OneTwoPlate, OneThreePlate, OneFourPlate, LPlate,
-	TwoTwoPlate, TwoThreePlate, TwoFourPlate, ThreeThreePlate extends Brick {}
-fun length[] : Brick -> Int {
-	OneOne->1 + OneTwo->2 + OneThree->3 + OneFour->4 +
-		TwoTwo->2 + LBlock->2 + TwoThree->2 + TwoFour->2 +
-		OneOnePlate->1 + OneTwoPlate->2 + OneThreePlate->3 + OneFourPlate->4 +
-		LPlate->2 + TwoTwoPlate->2 + TwoThreePlate->2 + TwoFourPlate->2 +
-		ThreeThreePlate -> 3}
-fun width[] : Brick -> Int {
-	OneOne->1 + OneTwo->1 + OneThree->1 + OneFour->1 +
-		TwoTwo->2 + LBlock->2 + TwoThree->3 + TwoFour->4 +
-		OneOnePlate->1 + OneTwoPlate->1 + OneThreePlate->1 + OneFourPlate->1 +
-		LPlate->2 + TwoTwoPlate->2 + TwoThreePlate->3 + TwoFourPlate->4 +
-		ThreeThreePlate -> 3}
-fun height[] : Brick -> Int {
-	OneOne->3 + OneTwo->3 + OneThree->3 + OneFour->3 +
-		TwoTwo->3 + LBlock->3 + TwoThree->3 + TwoFour->3 +
-		OneOnePlate->1 + OneTwoPlate->1 + OneThreePlate->1 + OneFourPlate->1 +
-		LPlate->1 + TwoTwoPlate->1 + TwoThreePlate->1 + TwoFourPlate->1 +
-		ThreeThreePlate -> 1}
-fun volume[] : Brick -> Int {
-	OneOne->3 + OneTwo->6 + OneThree->9 + OneFour->12 +
-		TwoTwo->12 + LBlock->9 + TwoThree->18 + TwoFour->24 +
-		OneOnePlate->1 + OneTwoPlate->2 + OneThreePlate->3 + OneFourPlate->4 +
-		LPlate->3 + TwoTwoPlate->4 + TwoThreePlate->6 + TwoFourPlate->8 +
-		ThreeThreePlate -> 9}
-fun inventory[] : Brick -> Int {
-	OneOne->10 + OneTwo->10 + OneThree->10 + OneFour->10 +
-		TwoTwo->10 + LBlock->10 + TwoThree->10 + TwoFour->10 +
-		OneOnePlate->10 + OneTwoPlate->10 + OneThreePlate->10 + OneFourPlate->10 +
-		LPlate->10 + TwoTwoPlate->10 + TwoThreePlate->10 + TwoFourPlate->10 +
-		ThreeThreePlate -> 10}
-
-abstract sig Colour {}
-one sig Red, Blue, Yellow extends Colour {}
 
 pred above[v1, v2 : one Voxel] {
 	v1.x = v2.x
@@ -58,6 +47,7 @@ pred above[v1, v2 : one Voxel] {
 pred aboveOrBelow[v1, v2 : one Voxel] {
 	above[v1,v2] or above[v2,v1]
 }
+
 pred xAdjacent[v1,v2 : one Voxel] {
 	v1.y = v2.y
 	v1.z = v2.z
@@ -80,6 +70,9 @@ fun zAdjacent[] : Voxel -> Voxel {
 fun yAdjacent[] : Voxel -> Voxel {
 	{v1, v2 : Voxel | aboveOrBelow[v1,v2] }
 }
+
+abstract sig Colour {}
+one sig Red, Blue, Yellow extends Colour {}
 
 fact WellPlaced {
 	-- all Voxels are assigned to some brick
@@ -104,7 +97,7 @@ fact WellPlaced {
 	all b : Brick | all v : b.voxels | v.colour = b.colour
 	--	Each brick is only as tall as brick allows
 	all b : Brick | all v : b.voxels |
-		 #(v.*(b.voxels <: yAdjacent :> b.voxels)) <= b.height
+		 #(v.*(b.voxels <: yAdjacent :> b.voxels)) = b.height
 	-- There must be at least one TwoTwo brick used
 	#(OneOne <: Brick) <= OneOne.inventory
 	#(OneTwo <: Brick) <= OneTwo.inventory
@@ -112,7 +105,7 @@ fact WellPlaced {
 	#(OneFour <: Brick) <= OneFour.inventory
 	#(TwoTwo <: Brick) <= TwoTwo.inventory
 	#(TwoThree <: Brick) <= TwoThree.inventory
-	#(LBlock <: Brick) <= LBlock.inventory
+	#(LBrick <: Brick) <= LBrick.inventory
 	#(TwoFour <: Brick) <= TwoFour.inventory
 	#(OneTwoPlate <: Brick) <= OneTwoPlate.inventory
 	#(OneOnePlate <: Brick) <= OneOnePlate.inventory
