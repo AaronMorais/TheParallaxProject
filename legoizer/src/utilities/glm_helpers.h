@@ -6,7 +6,7 @@
 namespace plx {
 namespace glm_helpers {
 
-glm::vec3 midpoint(glm::vec3& v1, glm::vec3& v2);
+const glm::vec3 midpoint(const glm::vec3& v1, const glm::vec3& v2);
 
 }
 }

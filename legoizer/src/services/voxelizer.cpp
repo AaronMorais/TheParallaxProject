@@ -344,5 +344,4 @@ Voxelizer::ShapeVoxelizer::save()
     }
 }
 
-
 }
