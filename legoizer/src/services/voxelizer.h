@@ -4,7 +4,6 @@
 #include "obj_data.h"
 #include "lego_data.h"
 #include <vector>
-#include <memory>
 
 namespace plx {
 

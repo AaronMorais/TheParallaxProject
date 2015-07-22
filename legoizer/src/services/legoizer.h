@@ -2,15 +2,19 @@
 #define _LEGOIZER_H__
 
 #include "lego_data.h"
-#include <memory>
 
 namespace plx {
 
 class Legoizer {
 public:
-    Legoizer(std::shared_ptr<plx::LegoData> data);
+    Legoizer(std::shared_ptr<tinyobj::ObjData> data);
 
     void voxelize();
+    void preprocessor();
+
+    void writeAlloy(std::ostream& os);
+    void writeAlloyOld(std::ostream& os);
+    void writeObj(std::ostream& os);
 
     std::shared_ptr<plx::LegoData> data();
 

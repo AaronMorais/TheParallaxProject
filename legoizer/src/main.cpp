@@ -15,7 +15,9 @@ void printError(
     std::cerr << "-Output <filename>    output file (if none, to cout)" << std::endl;
     std::cerr << "-Materials <filepath> materials path for input .obj " << std::endl;
     std::cerr << "-voxelize             voxelize .obj input" << std::endl;
-    std::cerr << "-alloy                output as alloy model (default obj)" << std::endl;
+    std::cerr << "-allow                write as allow model" << std::endl;
+    std::cerr << "-alloy_old            write as alloy model (deprecated)" << std::endl;
+    std::cerr << "-obj                  write as obj model" << std::endl;
     std::cerr << "-subdivisions <int>   number of subdivisions" << std::endl;
     std::cerr << "-fill                 fill the voxel model" << std::endl;
 }
@@ -34,6 +36,8 @@ main(
 
     bool should_legoize = false;
     bool should_print_alloy = false;
+    bool should_print_alloy_old = false;
+    bool should_print_obj = false;
 
     std::string file_name;
     std::string model_path;
@@ -52,6 +56,10 @@ main(
             should_legoize = true;
         } else if (strcmp(argv[i], "-alloy") == 0) {
             should_print_alloy = true;
+        } else if (strcmp(argv[i], "-alloy_old") == 0) {
+            should_print_alloy_old = true;
+        } else if (strcmp(argv[i], "-alloy_obj") == 0) {
+            should_print_obj = true;
         } else if (strcmp(argv[i], "-fill") == 0) {
             plx::Legoizer::shouldFillShell = true;
         } else if (strcmp(argv[i], "-subdivisions") == 0 && (i+1 < argc)) {
@@ -72,17 +80,18 @@ main(
         obj_data = tinyobj::ObjData::Factory::Create(file_name.c_str(), model_path.c_str());
     }
 
-    std::shared_ptr<plx::LegoData> lego_data = std::make_shared<plx::LegoData>(obj_data);
-    std::shared_ptr<plx::Legoizer> legoizer = std::make_shared<plx::Legoizer>(lego_data);
+    std::shared_ptr<plx::Legoizer> legoizer = std::make_shared<plx::Legoizer>(obj_data);
 
     if (should_legoize) {
         legoizer->voxelize();
     }
 
     if (should_print_alloy) {
-        lego_data->printAlloy(*os);
-    } else {
-        lego_data->printObj(*os);
+        legoizer->writeAlloy(*os);
+    } else if (should_print_alloy_old) {
+        legoizer->writeAlloyOld(*os);
+    } else if (should_print_obj) {
+        legoizer->writeObj(*os);
     }
 
     std::cerr << "Completed" << std::endl;
