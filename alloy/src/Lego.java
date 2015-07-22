@@ -30,9 +30,10 @@ import edu.mit.csail.sdg.alloy4compiler.translator.A4TupleSet;
 import edu.mit.csail.sdg.alloy4compiler.translator.TranslateAlloyToKodkod;
 
 public class Lego {
-  private static String lego_model_file_name = "lego.als";
-  private static String output_xml_file_name = "lego.xml";
-  private static String output_json_file_name = "lego.json";
+
+  private static boolean legoModeIsVoxel = true;
+  private static String outputXmlFileName = "lego.xml";
+  private static String outputJsonFileName = "lego.json";
 
   public static void main(String[] args) throws Exception {
     String modelName = getModelName(args);
@@ -40,8 +41,20 @@ public class Lego {
       System.err.println("No model name provided");
     }
 
+    String[] modelNameSplit = modelName.split("\\.");
+    if (modelNameSplit.length < 2) {
+      System.err.println("Model name does not have an extension");
+    }
+    if (modelNameSplit[1].equals("bricks")) {
+      legoModeIsVoxel = false;
+    }
+
     String lego_model = readFile(modelName);
+    String lego_model_file_name = getLegoModelFileName();
     lego_model += "\n" + readFile(lego_model_file_name);
+
+    System.out.println("Reading model at: " + modelName);
+    System.out.println("Reading base model at: " + lego_model_file_name);
 
     // TODO: Fully understand the black box below.
     A4Reporter rep = new A4Reporter();
@@ -55,12 +68,16 @@ public class Lego {
     Command cmd = world.getAllCommands().get(0);
     A4Solution sol = TranslateAlloyToKodkod.execute_commandFromBook(rep, world.getAllReachableSigs(), cmd, opt);
 
-    // Output through the solutions
+    // Iterate through the solutions
     assert sol.satisfiable();
     int solution_count = 1;
     while (sol.satisfiable()) {
-      sol.writeXML(output_xml_file_name);
-      output_solution_json(world, sol);
+      sol.writeXML(outputXmlFileName);
+      if (legoModeIsVoxel) {
+        output_voxel_solution_json(world, sol);
+      } else {
+        output_brick_solution_json(world, sol);
+      }
       System.out.println("Solution #" + String.valueOf(solution_count) + " generated. Press enter for next solution.");
       Scanner keyboard = new Scanner(System.in);
       keyboard.nextLine();
@@ -75,7 +92,7 @@ public class Lego {
     }
   }
 
-  private static void output_solution_json(Module world, A4Solution sol) throws Exception {
+  private static void output_voxel_solution_json(Module world, A4Solution sol) throws Exception {
     Map voxels = new LinkedHashMap();
     Expr xVoxel = CompUtil.parseOneExpression_fromString(world, "Voxel<:x");
     Iterator<A4Tuple> itr = ((A4TupleSet)sol.eval(xVoxel)).iterator();
@@ -134,8 +151,14 @@ public class Lego {
     JSONValue.writeJSONString(list, listOut);
     String listJSON = listOut.toString();
 
-    PrintWriter out = new PrintWriter(output_json_file_name);
+    PrintWriter out = new PrintWriter(outputJsonFileName);
     out.println(listJSON);
+    out.close();
+  }
+
+  private static void output_brick_solution_json(Module world, A4Solution sol) throws Exception {
+    PrintWriter out = new PrintWriter(outputJsonFileName);
+    out.println("");
     out.close();
   }
 
@@ -149,6 +172,13 @@ public class Lego {
       if (bos != null)
           bos.close();
     }
+  }
+
+  private static String getLegoModelFileName() {
+    if (legoModeIsVoxel) {
+      return "models/voxels/lego.als";
+    }
+    return "models/bricks/lego.als";
   }
 
   private static String getModelName(String[] args) {

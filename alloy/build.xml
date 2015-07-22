@@ -49,39 +49,45 @@
     </java>
   </target>
 
-
-  <target name="cube" description="Run cube test" depends="jar">
+  <target name="cube-bricks" description="Run cube test" depends="jar">
     <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
-      <arg line="-model models/cube.model"/>
+      <arg line="-model models/bricks/cube.bricks"/>
     </java>
   </target>
 
-  <target name="pyramid" description="Run pyramid test" depends="jar">
+  <target name="cube-voxel" description="Run cube test" depends="jar">
     <java classname="Lego" maxmemory="1g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
-      <arg line="-model models/pyramid.model"/>
+      <arg line="-model models/voxels/cube.voxels"/>
     </java>
   </target>
 
-  <target name="lblock" description="Run L-Block test" depends="jar">
+  <target name="pyramid-voxel" description="Run pyramid test" depends="jar">
+    <java classname="Lego" maxmemory="1g" fork="true"
+      classpathref="parallax.classpath" failonerror="true">
+      <arg line="-model models/voxels/pyramid.voxels"/>
+    </java>
+  </target>
+
+  <target name="lblock-voxel" description="Run L-Block test" depends="jar">
     <java classname="Lego"
       classpathref="parallax.classpath" failonerror="true">
-      <arg line="-model models/l-block.model"/>
+      <arg line="-model models/voxels/l-block.voxels"/>
     </java>
   </target>
 
-  <target name="line" description="Run line test" depends="jar">
+  <target name="line-voxel" description="Run line test" depends="jar">
     <java classname="Lego"
       classpathref="parallax.classpath" failonerror="true">
-      <arg line="-model models/line.model"/>
+      <arg line="-model models/voxels/line.voxels"/>
     </java>
   </target>
 
-  <target name="teapot" description="Run teapot test" depends="jar">
+  <target name="teapot-voxel" description="Run teapot test" depends="jar">
     <java classname="Lego" maxmemory="4g" fork="true"
       classpathref="parallax.classpath" failonerror="true">
-      <arg line="-model models/teapot.model"/>
+      <arg line="-model models/voxels/teapot.voxels"/>
     </java>
   </target>
 
