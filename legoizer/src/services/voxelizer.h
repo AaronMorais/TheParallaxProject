@@ -29,7 +29,7 @@ public:
         const tinyobj::shape_t& m_shape;
 
         static std::tuple<glm::vec3, glm::vec3> calculateMinMaxDimensions(const std::vector<glm::vec3>& faces, const std::vector<glm::vec3>& vertices);
-        static float calculateVoxelUnit(const glm::vec3& min, const glm::vec3& max);
+        static float calculateVoxelUnit(const glm::vec3& min, const glm::vec3& max, size_t subdivisions);
         static glm::vec3 calculateVoxelGridDimensions(const glm::vec3& min, const glm::vec3& max, const float& voxel_unit);
 
         bool arePointsClose(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);

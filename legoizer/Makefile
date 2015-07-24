@@ -65,7 +65,7 @@ clean:
 	@echo "    $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)"; $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)
 
 run-teapot: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) -File $(ASSETS_DIR)/teapot.obj -Output $(BUILD_DIR)/teapot.model -voxelize -alloy -fill -subdivisions 3
+	$(PROJECT_TARGET) -File $(ASSETS_DIR)/teapot.obj -Output $(BUILD_DIR)/teapot.model -voxelize -preprocess -alloy -fill -subdivisions 3
 
 run-tests: $(TEST_TARGET)
 	$(TEST_TARGET) -File $(ASSETS_DIR)/teapot.obj -voxelize -fill -subdivisions 2

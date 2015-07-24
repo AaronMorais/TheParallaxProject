@@ -4,7 +4,7 @@
 
 namespace plx {
 
-int Legoizer::subdivisions = 40;
+size_t Legoizer::subdivisions = 40;
 bool Legoizer::shouldFillShell = false;
 
 Legoizer::Legoizer(std::shared_ptr<tinyobj::ObjData> obj_data) :
@@ -19,7 +19,7 @@ void Legoizer::voxelize()
     voxelizer->voxelize();
 }
 
-void Legoizer::preprocessor()
+void Legoizer::preprocess()
 {
     std::shared_ptr<plx::Preprocessor> preprocessor = std::make_shared<plx::Preprocessor>(m_data);
 

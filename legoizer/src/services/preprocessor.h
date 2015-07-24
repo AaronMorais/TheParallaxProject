@@ -13,6 +13,29 @@ public:
 
     std::shared_ptr<plx::LegoData> data();
 
+    class Brick {
+    public:
+        const std::vector<glm::vec3>& location() const;
+    protected:
+        std::vector<glm::vec3> m_location;
+    };
+
+    class OneOnePlate : public Brick {
+    public:
+        OneOnePlate(const std::vector<glm::vec3>& location);
+        static const std::vector<std::vector<glm::vec3>>& orientations();
+    private:
+        static std::vector<std::vector<glm::vec3>> m_orientations;
+    };
+
+    class OneTwoPlate : public Brick {
+    public:
+        OneTwoPlate(const std::vector<glm::vec3>& location);
+        static const std::vector<std::vector<glm::vec3>>& orientations();
+    private:
+        static std::vector<std::vector<glm::vec3>> m_orientations;
+    };
+
 private:
     std::shared_ptr<plx::LegoData> m_data;
 };

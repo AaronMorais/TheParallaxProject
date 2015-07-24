@@ -10,7 +10,7 @@ public:
     Legoizer(std::shared_ptr<tinyobj::ObjData> data);
 
     void voxelize();
-    void preprocessor();
+    void preprocess();
 
     void writeAlloy(std::ostream& os);
     void writeAlloyOld(std::ostream& os);
@@ -18,7 +18,7 @@ public:
 
     std::shared_ptr<plx::LegoData> data();
 
-    static int subdivisions;
+    static size_t subdivisions;
     static bool shouldFillShell;
 
 private:

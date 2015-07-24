@@ -16,5 +16,26 @@ midpoint(
     );
 }
 
+std::ostream& operator<< (std::ostream& out, const std::vector<glm::vec3>& list)
+{
+    for (const glm::vec3& v : list) {
+        out << '[' << glm::to_string(v) << "," << "]";
+    }
+    return out;
+}
+
+
+std::ostream& operator<< (std::ostream& out, const std::vector<std::vector<std::vector<size_t>>>& grid)
+{
+    for (size_t i = 0; i < grid.size(); ++i) {
+        for (size_t j = 0; j < grid[i].size(); ++j) {
+            for (size_t k = 0; k < grid[i][j].size(); ++k) {
+                out << i << "," << j << "," << k << " = " << grid[i][j][k] << std::endl;
+            }
+        }
+    }
+    return out;
+}
+
 }
 }

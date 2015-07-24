@@ -34,7 +34,8 @@ main(
         return 1;
     }
 
-    bool should_legoize = false;
+    bool should_voxelize = false;
+    bool should_preprocess = false;
     bool should_print_alloy = false;
     bool should_print_alloy_old = false;
     bool should_print_obj = false;
@@ -53,7 +54,9 @@ main(
         } else if (strcmp(argv[i], "-Materials") == 0 && (i+1 < argc)) {
             model_path = argv[i+1]; i+=1;
         } else if (strcmp(argv[i], "-voxelize") == 0) {
-            should_legoize = true;
+            should_voxelize = true;
+        } else if (strcmp(argv[i], "-preprocess") == 0) {
+            should_preprocess = true;
         } else if (strcmp(argv[i], "-alloy") == 0) {
             should_print_alloy = true;
         } else if (strcmp(argv[i], "-alloy_old") == 0) {
@@ -82,9 +85,14 @@ main(
 
     std::shared_ptr<plx::Legoizer> legoizer = std::make_shared<plx::Legoizer>(obj_data);
 
-    if (should_legoize) {
+    if (should_voxelize) {
         legoizer->voxelize();
+
+        if (should_preprocess) {
+            legoizer->preprocess();
+        }
     }
+
 
     if (should_print_alloy) {
         legoizer->writeAlloy(*os);
