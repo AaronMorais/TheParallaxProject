@@ -36,6 +36,14 @@ public:
         static std::vector<std::vector<glm::vec3>> m_orientations;
     };
 
+    class OneFourPlate : public Brick {
+    public:
+        OneFourPlate(const std::vector<glm::vec3>& location);
+        static const std::vector<std::vector<glm::vec3>>& orientations();
+    private:
+        static std::vector<std::vector<glm::vec3>> m_orientations;
+    };
+
 private:
     std::shared_ptr<plx::LegoData> m_data;
 };

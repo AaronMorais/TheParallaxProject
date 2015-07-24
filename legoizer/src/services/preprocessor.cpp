@@ -48,9 +48,9 @@ Preprocessor::process()
     std::cout << "voxels: " << voxels.size() << std::endl;
 
     std::vector<std::vector<std::vector<size_t>>> grid =
-        std::vector<std::vector<std::vector<size_t>>>(dimensions.x + 1,
-        std::vector<std::vector<size_t>>(dimensions.y + 1,
-        std::vector<size_t>(dimensions.z + 1, 0)));
+        std::vector<std::vector<std::vector<size_t>>>(dimensions.x,
+        std::vector<std::vector<size_t>>(dimensions.y,
+        std::vector<size_t>(dimensions.z, 0)));
 
     for (const glm::vec3& voxel : voxels) {
         grid[(size_t)(voxel.x)][(size_t)(voxel.y)][(size_t)(voxel.z)] = 1;
@@ -60,6 +60,7 @@ Preprocessor::process()
     std::vector<std::vector<std::vector<glm::vec3>>> all_orientations;
     all_orientations.push_back(OneOnePlate::orientations());
     all_orientations.push_back(OneTwoPlate::orientations());
+    all_orientations.push_back(OneFourPlate::orientations());
 
     std::vector<std::vector<glm::vec3>> brick_locations;
     for (const glm::vec3& voxel : voxels) {
@@ -75,7 +76,10 @@ Preprocessor::process()
 
                 bool fits = true;
                 for (const glm::vec3& voxel_position : real_location) {
-                    if (grid[voxel_position.x][voxel_position.y][voxel_position.z] == 0) {
+                    if (voxel_position.x < dimensions.x &&
+                        voxel_position.y < dimensions.y &&
+                        voxel_position.z < dimensions.z &&
+                        grid[voxel_position.x][voxel_position.y][voxel_position.z] == 0) {
                         fits = false;
                     }
                 }
@@ -153,5 +157,34 @@ Preprocessor::OneTwoPlate::orientations()
 }
 
 std::vector<std::vector<glm::vec3>> Preprocessor::OneTwoPlate::m_orientations;
+
+
+Preprocessor::OneFourPlate::OneFourPlate(const std::vector<glm::vec3>& location)
+{
+    m_location = location;
+}
+
+
+const std::vector<std::vector<glm::vec3>>&
+Preprocessor::OneFourPlate::orientations()
+{
+    if (OneFourPlate::m_orientations.empty()) {
+        std::vector<glm::vec3> orientation1;
+        orientation1.push_back(glm::vec3(0, 0, 0));
+        orientation1.push_back(glm::vec3(0, 0, 1));
+        orientation1.push_back(glm::vec3(0, 0, 2));
+        orientation1.push_back(glm::vec3(0, 0, 3));
+        OneFourPlate::m_orientations.push_back(orientation1);
+        std::vector<glm::vec3> orientation2;
+        orientation2.push_back(glm::vec3(0, 0, 0));
+        orientation2.push_back(glm::vec3(1, 0, 0));
+        orientation2.push_back(glm::vec3(2, 0, 0));
+        orientation2.push_back(glm::vec3(3, 0, 0));
+        OneFourPlate::m_orientations.push_back(orientation2);
+    }
+    return OneFourPlate::m_orientations;
+}
+
+std::vector<std::vector<glm::vec3>> Preprocessor::OneFourPlate::m_orientations;
 
 }
