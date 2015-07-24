@@ -189,7 +189,7 @@ void Voxelizer::ShapeVoxelizer::voxelize(
         (v3.z - m_min.z) / m_unit
         );
 
-    if (arePointsClose(p1, p2, p3) || arePointsOnOccupiedVoxel(p1, p2, p3)){
+    if (arePointsClose(p1, p2, p3) && arePointsOnOccupiedVoxel(p1, p2, p3)){
         return;
     }
 
@@ -299,13 +299,10 @@ Voxelizer::ShapeVoxelizer::save()
     std::vector<glm::vec3>& voxels = m_data->voxels();
 
     for (size_t i = 0; i < m_grid.size(); ++i) {
-
         for (size_t j = 0; j < m_grid[i].size(); ++j) {
-
             for (size_t k = 0; k < m_grid[i][j].size(); ++k) {
 
-                if (Legoizer::shouldFillShell && m_grid[i][j][k] != 0)  {
-
+                if (m_grid[i][j][k] != 0)  {
                     voxels.push_back(glm::vec3(i,j,k));
 
                     float scale = Voxelizer::scale();
