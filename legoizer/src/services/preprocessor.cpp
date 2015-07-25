@@ -13,12 +13,12 @@ Preprocessor::Preprocessor(std::shared_ptr<plx::LegoData> data) :
 void
 Preprocessor::process()
 {
-    std::vector<glm::vec3>& voxels = m_data->voxels();
+    std::vector<glm::vec3>& model = m_data->voxels();
 
     glm::vec3 min(INT_MAX, INT_MAX, INT_MAX);
     glm::vec3 max(INT_MIN, INT_MIN, INT_MIN);
 
-    for (const glm::vec3& voxel : voxels) {
+    for (const glm::vec3& voxel : model) {
         if (voxel.x > max.x) {
             max.x = voxel.x;
         }
@@ -45,25 +45,40 @@ Preprocessor::process()
     std::cout << "min:" << glm::to_string(min) << std::endl;
     std::cout << "max:" << glm::to_string(max) << std::endl;
     std::cout << "dim:" << glm::to_string(dimensions) << std::endl;
-    std::cout << "voxels: " << voxels.size() << std::endl;
+    std::cout << "voxels: " << model.size() << std::endl;
 
+    std::vector<std::vector<glm::vec3>> brick_locations;
+    processLocations(brick_locations, model, dimensions);
+
+    for (const std::vector<glm::vec3>& pos : brick_locations) {
+        for (const glm::vec3& p : pos) {
+            std::cout << "(" << (size_t)p.x << "," << (size_t)p.y << "," << (size_t)p.z << ")";
+        }
+
+        std::cout << std::endl;
+    }
+
+    std::cout << "brick_locations: " << brick_locations.size() << std::endl;
+}
+
+void
+Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locations, std::vector<glm::vec3>& model, glm::vec3 dimensions)
+{
     std::vector<std::vector<std::vector<size_t>>> grid =
         std::vector<std::vector<std::vector<size_t>>>(dimensions.x,
         std::vector<std::vector<size_t>>(dimensions.y,
         std::vector<size_t>(dimensions.z, 0)));
 
-    for (const glm::vec3& voxel : voxels) {
+    for (const glm::vec3& voxel : model) {
         grid[(size_t)(voxel.x)][(size_t)(voxel.y)][(size_t)(voxel.z)] = 1;
     }
-
 
     std::vector<std::vector<std::vector<glm::vec3>>> all_orientations;
     all_orientations.push_back(OneOnePlate::orientations());
     all_orientations.push_back(OneTwoPlate::orientations());
     all_orientations.push_back(OneFourPlate::orientations());
 
-    std::vector<std::vector<glm::vec3>> brick_locations;
-    for (const glm::vec3& voxel : voxels) {
+    for (const glm::vec3& voxel : model) {
 
         for (const std::vector<std::vector<glm::vec3>>& brick_orientations : all_orientations) {
 
@@ -90,16 +105,6 @@ Preprocessor::process()
             }
         }
     }
-
-    for (const std::vector<glm::vec3>& pos : brick_locations) {
-        for (const glm::vec3& p : pos) {
-            std::cout << "(" << (size_t)p.x << "," << (size_t)p.y << "," << (size_t)p.z << ")";
-        }
-
-        std::cout << std::endl;
-    }
-
-    std::cout << "brick_locations: " << brick_locations.size() << std::endl;
 }
 
 std::shared_ptr<plx::LegoData>
