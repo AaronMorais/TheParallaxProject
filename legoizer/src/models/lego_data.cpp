@@ -54,10 +54,10 @@ LegoData::printAlloy(
 {
     std::vector<glm::vec3>& voxels = this->voxels();
 
-    os << "--" << voxels.size() << " " << "number of voxels" << std::endl;
+    os << "--" << "number of voxels: " << voxels.size() << std::endl;
 
     for (size_t i = 0; i < voxels.size(); i++) {
-        os << "-- Block" << i << " -> " << (int)(voxels[i].x) << "," << (int)(voxels[i].y) << "," << (int)(voxels[i].z) << std::endl;
+        os << "-- Voxel" << i << " -> " << (int)(voxels[i].x) << "," << (int)(voxels[i].y) << "," << (int)(voxels[i].z) << std::endl;
     }
 
     os << "abstract sig Voxel {}" << std::endl;
@@ -68,7 +68,7 @@ LegoData::printAlloy(
         if (i != 0) {
             os << ", ";
         }
-        os << "Block" << i;
+        os << "Voxel" << i;
     }
 
     os << " " << "extends Voxel {}" << std::endl;
@@ -79,7 +79,7 @@ LegoData::printAlloy(
         if (i != 0) {
             os << "+";
         }
-        os << "Block" << i << "->" << (int)(voxels[i].x);
+        os << "Voxel" << i << "->" << (int)(voxels[i].x);
     }
 
     os << "}" << std::endl;
@@ -90,7 +90,7 @@ LegoData::printAlloy(
         if (i != 0) {
             os << "+";
         }
-        os << "Block" << i << "->" << (int)(voxels[i].y);
+        os << "Voxel" << i << "->" << (int)(voxels[i].y);
     }
 
     os << "}" << std::endl;
@@ -101,7 +101,7 @@ LegoData::printAlloy(
         if (i != 0) {
             os << "+";
         }
-        os << "Block" << i << "->" << (int)(voxels[i].z);
+        os << "Voxel" << i << "->" << (int)(voxels[i].z);
     }
 
     os << "}" << std::endl;
@@ -112,7 +112,7 @@ LegoData::printAlloy(
         if (i != 0) {
             os << "+";
         }
-        os << "Block" << i << "->" << "Red";
+        os << "Voxel" << i << "->" << "Red";
     }
 
     os << "}" << std::endl;
