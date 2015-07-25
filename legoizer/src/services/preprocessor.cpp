@@ -91,9 +91,9 @@ Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locati
 
                 bool fits = true;
                 for (const glm::vec3& voxel_position : real_location) {
-                    if (voxel_position.x < dimensions.x &&
-                        voxel_position.y < dimensions.y &&
-                        voxel_position.z < dimensions.z &&
+                    if (voxel_position.x >= dimensions.x ||
+                        voxel_position.y >= dimensions.y ||
+                        voxel_position.z >= dimensions.z ||
                         grid[voxel_position.x][voxel_position.y][voxel_position.z] == 0) {
                         fits = false;
                     }
