@@ -2,7 +2,6 @@
 #include "glm/ext.hpp"
 
 #include <iostream>
-
 namespace plx {
 
 Preprocessor::Preprocessor(std::shared_ptr<plx::LegoData> data) :
@@ -47,13 +46,13 @@ Preprocessor::process()
     std::cout << "dim:" << glm::to_string(dimensions) << std::endl;
     std::cout << "voxels: " << model.size() << std::endl;
 
-    std::vector<std::vector<glm::vec3>> brick_locations;
+    std::vector<Position> brick_locations;
     processLocations(brick_locations, model, dimensions);
 
     unsigned int index = 0;
-    for (const std::vector<glm::vec3>& pos : brick_locations) {
+    for (const Position& pos : brick_locations) {
         std::cout << index << ": ";
-        for (const glm::vec3& p : pos) {
+        for (const glm::vec3& p : pos.location) {
             std::cout << "(" << (size_t)p.x << "," << (size_t)p.y << "," << (size_t)p.z << ")";
         }
 
@@ -79,7 +78,7 @@ Preprocessor::process()
 }
 
 void
-Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions)
+Preprocessor::processLocations(std::vector<Preprocessor::Position>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions)
 {
     std::vector<std::vector<std::vector<size_t>>> grid =
         std::vector<std::vector<std::vector<size_t>>>(dimensions.x,
@@ -90,16 +89,16 @@ Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locati
         grid[(size_t)(voxel.x)][(size_t)(voxel.y)][(size_t)(voxel.z)] = 1;
     }
 
-    std::vector<std::vector<std::vector<glm::vec3>>> all_orientations;
-    all_orientations.push_back(OneOnePlate::orientations());
-    all_orientations.push_back(OneTwoPlate::orientations());
-    all_orientations.push_back(OneFourPlate::orientations());
+    std::vector<std::pair<std::vector<std::vector<glm::vec3>>, std::string>> all_orientations;
+    all_orientations.push_back(std::make_pair(OneOnePlate::orientations(), OneOnePlate::name()));
+    all_orientations.push_back(std::make_pair(OneTwoPlate::orientations(), OneTwoPlate::name()));
+    all_orientations.push_back(std::make_pair(OneFourPlate::orientations(), OneFourPlate::name()));
 
     for (const glm::vec3& voxel : model) {
 
-        for (const std::vector<std::vector<glm::vec3>>& brick_orientations : all_orientations) {
+        for (const std::pair<std::vector<std::vector<glm::vec3>>, std::string>& brick_orientation : all_orientations) {
 
-            for (const std::vector<glm::vec3>& orientation : brick_orientations) {
+            for (const std::vector<glm::vec3>& orientation : brick_orientation.first) {
 
                 std::vector<glm::vec3> real_location;
                 for (const glm::vec3& voxel_position : orientation) {
@@ -117,7 +116,10 @@ Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locati
                 }
 
                 if (fits) {
-                    brick_locations.push_back(real_location);
+                    Position position;
+                    position.location = real_location;
+                    position.brick_type = brick_orientation.second;
+                    brick_locations.push_back(position);
                 }
             }
         }
@@ -125,17 +127,17 @@ Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locati
 }
 
 void
-Preprocessor::processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<std::vector<glm::vec3>>& brick_locations)
+Preprocessor::processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<Preprocessor::Position>& brick_locations)
 {
-    for (const std::vector<glm::vec3>& location_i : brick_locations) {
+    for (const Position& location_i : brick_locations) {
         unsigned int index = 0;
         std::vector<unsigned int> conflicts;
-        for (const std::vector<glm::vec3>& location_j : brick_locations) {
-            if (location_i != location_j) {
+        for (const Position& location_j : brick_locations) {
+            if (&location_i != &location_j) {
                 bool conflict = false;
-                for (const glm::vec3& voxel_i : location_i) {
+                for (const glm::vec3& voxel_i : location_i.location) {
                     if (conflict) break;
-                    for (const glm::vec3& voxel_j : location_j) {
+                    for (const glm::vec3& voxel_j : location_j.location) {
                         if (conflict) break;
                         if (voxel_i == voxel_j) {
                             conflict = true;
@@ -169,6 +171,11 @@ Preprocessor::OneOnePlate::OneOnePlate(const std::vector<glm::vec3>& location)
     m_location = location;
 }
 
+const std::string
+Preprocessor::OneOnePlate::name()
+{
+    return "OneOnePlate";
+}
 const std::vector<std::vector<glm::vec3>>&
 Preprocessor::OneOnePlate::orientations()
 {
@@ -188,6 +195,11 @@ Preprocessor::OneTwoPlate::OneTwoPlate(const std::vector<glm::vec3>& location)
     m_location = location;
 }
 
+const std::string
+Preprocessor::OneTwoPlate::name()
+{
+    return "OneTwoPlate";
+}
 
 const std::vector<std::vector<glm::vec3>>&
 Preprocessor::OneTwoPlate::orientations()
@@ -213,6 +225,11 @@ Preprocessor::OneFourPlate::OneFourPlate(const std::vector<glm::vec3>& location)
     m_location = location;
 }
 
+const std::string
+Preprocessor::OneFourPlate::name()
+{
+    return "OneFourPlate";
+}
 
 const std::vector<std::vector<glm::vec3>>&
 Preprocessor::OneFourPlate::orientations()

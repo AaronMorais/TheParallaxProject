@@ -11,6 +11,11 @@ public:
 
     void process();
 
+    struct Position {
+        std::vector<glm::vec3> location;
+        std::string brick_type;
+    };
+
     std::shared_ptr<plx::LegoData> data();
 
     class Brick {
@@ -24,6 +29,7 @@ public:
     public:
         OneOnePlate(const std::vector<glm::vec3>& location);
         static const std::vector<std::vector<glm::vec3>>& orientations();
+        static const std::string name();
     private:
         static std::vector<std::vector<glm::vec3>> m_orientations;
     };
@@ -32,6 +38,7 @@ public:
     public:
         OneTwoPlate(const std::vector<glm::vec3>& location);
         static const std::vector<std::vector<glm::vec3>>& orientations();
+        static const std::string name();
     private:
         static std::vector<std::vector<glm::vec3>> m_orientations;
     };
@@ -40,14 +47,15 @@ public:
     public:
         OneFourPlate(const std::vector<glm::vec3>& location);
         static const std::vector<std::vector<glm::vec3>>& orientations();
+        static const std::string name();
     private:
         static std::vector<std::vector<glm::vec3>> m_orientations;
     };
 
 private:
     std::shared_ptr<plx::LegoData> m_data;
-    void processLocations(std::vector<std::vector<glm::vec3>>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions);
-    void processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<std::vector<glm::vec3>>& brick_locations);
+    void processLocations(std::vector<Position>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions);
+    void processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<Position>& brick_locations);
 };
 
 }
