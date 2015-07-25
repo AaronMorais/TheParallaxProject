@@ -11,8 +11,13 @@ public:
 
     void process();
 
+    struct Location {
+        std::vector<glm::vec3> byVoxel;
+        std::vector<unsigned int> byVoxelIndex;
+    };
+
     struct Position {
-        std::vector<glm::vec3> location;
+        Location location;
         std::string brick_type;
     };
 

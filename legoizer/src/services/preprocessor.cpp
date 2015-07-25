@@ -51,12 +51,18 @@ Preprocessor::process()
 
     unsigned int index = 0;
     for (const Position& pos : brick_locations) {
-        std::cout << index << ": ";
-        for (const glm::vec3& p : pos.location) {
+        std::cout << "b" << index << ": ";
+        for (const glm::vec3& p : pos.location.byVoxel) {
             std::cout << "(" << (size_t)p.x << "," << (size_t)p.y << "," << (size_t)p.z << ")";
         }
-
         std::cout << std::endl;
+
+        std::cout << "b" << index << " -> (";
+        for (const unsigned int p : pos.location.byVoxelIndex) {
+            std::cout << " v" << p << " ";
+        }
+        std::cout << ")" << std::endl;
+
         index++;
     }
 
@@ -68,9 +74,9 @@ Preprocessor::process()
     processConflicts(brick_conflicts, brick_locations);
     for (unsigned int location_index = 0; location_index < brick_conflicts.size(); ++location_index) {
         num_conflicts += brick_conflicts[location_index].size();
-        std::cout << location_index << " -> " << brick_conflicts[location_index][0];
+        std::cout << "b" << location_index << " -> b" << brick_conflicts[location_index][0];
         for (unsigned int conflict_index = 1; conflict_index < brick_conflicts[location_index].size(); ++conflict_index) {
-            std::cout << " + " << brick_conflicts[location_index][conflict_index];
+            std::cout << " + b" << brick_conflicts[location_index][conflict_index];
         }
         std::cout << std::endl;
     }
@@ -85,8 +91,11 @@ Preprocessor::processLocations(std::vector<Preprocessor::Position>& brick_locati
         std::vector<std::vector<size_t>>(dimensions.y,
         std::vector<size_t>(dimensions.z, 0)));
 
+    unsigned int voxel_index = 1;
+    //1-indexed because grid is unsigned and 0 is reserved for off-voxels
     for (const glm::vec3& voxel : model) {
-        grid[(size_t)(voxel.x)][(size_t)(voxel.y)][(size_t)(voxel.z)] = 1;
+        grid[(size_t)(voxel.x)][(size_t)(voxel.y)][(size_t)(voxel.z)] = voxel_index;
+        voxel_index++;
     }
 
     std::vector<std::pair<std::vector<std::vector<glm::vec3>>, std::string>> all_orientations;
@@ -100,18 +109,22 @@ Preprocessor::processLocations(std::vector<Preprocessor::Position>& brick_locati
 
             for (const std::vector<glm::vec3>& orientation : brick_orientation.first) {
 
-                std::vector<glm::vec3> real_location;
+
+                Location real_location;
                 for (const glm::vec3& voxel_position : orientation) {
-                    real_location.push_back(glm::vec3(voxel.x + voxel_position.x, voxel.y + voxel_position.y, voxel.z + voxel_position.z));
+                    real_location.byVoxel.push_back(glm::vec3(voxel.x + voxel_position.x, voxel.y + voxel_position.y, voxel.z + voxel_position.z));
                 }
 
                 bool fits = true;
-                for (const glm::vec3& voxel_position : real_location) {
+                for (const glm::vec3& voxel_position : real_location.byVoxel) {
                     if (voxel_position.x >= dimensions.x ||
                         voxel_position.y >= dimensions.y ||
                         voxel_position.z >= dimensions.z ||
                         grid[voxel_position.x][voxel_position.y][voxel_position.z] == 0) {
                         fits = false;
+                    } else {
+                        //grid is 1-indexed so need to offset
+                        real_location.byVoxelIndex.push_back(grid[voxel_position.x][voxel_position.y][voxel_position.z] - 1);
                     }
                 }
 
@@ -135,9 +148,9 @@ Preprocessor::processConflicts(std::vector<std::vector<unsigned int>>& brick_con
         for (const Position& location_j : brick_locations) {
             if (&location_i != &location_j) {
                 bool conflict = false;
-                for (const glm::vec3& voxel_i : location_i.location) {
+                for (const glm::vec3& voxel_i : location_i.location.byVoxel) {
                     if (conflict) break;
-                    for (const glm::vec3& voxel_j : location_j.location) {
+                    for (const glm::vec3& voxel_j : location_j.location.byVoxel) {
                         if (conflict) break;
                         if (voxel_i == voxel_j) {
                             conflict = true;
