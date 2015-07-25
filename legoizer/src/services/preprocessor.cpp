@@ -50,19 +50,36 @@ Preprocessor::process()
     std::vector<std::vector<glm::vec3>> brick_locations;
     processLocations(brick_locations, model, dimensions);
 
+    unsigned int index = 0;
     for (const std::vector<glm::vec3>& pos : brick_locations) {
+        std::cout << index << ": ";
         for (const glm::vec3& p : pos) {
             std::cout << "(" << (size_t)p.x << "," << (size_t)p.y << "," << (size_t)p.z << ")";
         }
 
         std::cout << std::endl;
+        index++;
     }
 
     std::cout << "brick_locations: " << brick_locations.size() << std::endl;
+
+    std::cout << "conflicts: " << std::endl;
+    unsigned int num_conflicts = 0;
+    std::vector<std::vector<unsigned int>> brick_conflicts;
+    processConflicts(brick_conflicts, brick_locations);
+    for (unsigned int location_index = 0; location_index < brick_conflicts.size(); ++location_index) {
+        num_conflicts += brick_conflicts[location_index].size();
+        std::cout << location_index << " -> " << brick_conflicts[location_index][0];
+        for (unsigned int conflict_index = 1; conflict_index < brick_conflicts[location_index].size(); ++conflict_index) {
+            std::cout << " + " << brick_conflicts[location_index][conflict_index];
+        }
+        std::cout << std::endl;
+    }
+    std::cout << num_conflicts << " conflicts for " << brick_conflicts.size() << " bricks" << std::endl;
 }
 
 void
-Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locations, std::vector<glm::vec3>& model, glm::vec3 dimensions)
+Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions)
 {
     std::vector<std::vector<std::vector<size_t>>> grid =
         std::vector<std::vector<std::vector<size_t>>>(dimensions.x,
@@ -106,6 +123,33 @@ Preprocessor::processLocations(std::vector<std::vector<glm::vec3>>& brick_locati
         }
     }
 }
+
+void
+Preprocessor::processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<std::vector<glm::vec3>>& brick_locations)
+{
+    for (const std::vector<glm::vec3>& location_i : brick_locations) {
+        unsigned int index = 0;
+        std::vector<unsigned int> conflicts;
+        for (const std::vector<glm::vec3>& location_j : brick_locations) {
+            if (location_i != location_j) {
+                bool conflict = false;
+                for (const glm::vec3& voxel_i : location_i) {
+                    if (conflict) break;
+                    for (const glm::vec3& voxel_j : location_j) {
+                        if (conflict) break;
+                        if (voxel_i == voxel_j) {
+                            conflict = true;
+                            conflicts.push_back(index);
+                        }
+                    }
+                }
+            }
+            index++;
+        }
+        brick_conflicts.push_back(conflicts);
+    }
+}
+
 
 std::shared_ptr<plx::LegoData>
 Preprocessor::data()

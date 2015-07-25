@@ -46,7 +46,8 @@ public:
 
 private:
     std::shared_ptr<plx::LegoData> m_data;
-    void processLocations(std::vector<std::vector<glm::vec3>>& brick_locations, std::vector<glm::vec3>& voxels, glm::vec3 dimensions);
+    void processLocations(std::vector<std::vector<glm::vec3>>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions);
+    void processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<std::vector<glm::vec3>>& brick_locations);
 };
 
 }
