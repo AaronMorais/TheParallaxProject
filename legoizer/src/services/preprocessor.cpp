@@ -91,10 +91,15 @@ Preprocessor::processBricks(
     for (const glm::vec3& voxel : voxels) {
 
         for (const std::pair<std::vector<std::vector<glm::vec3>>, std::string>& brick_type : all_orientations) {
+
             for (const std::vector<glm::vec3>& unit_orientation : brick_type.first) {
+
                 std::vector<glm::vec3> translated_orientation = translateOrientation(voxel, unit_orientation);
+
                 if (orientationFits(translated_orientation)) {
+
                     std::shared_ptr<Brick> brick = Brick::Factory::create(brick_type.second.c_str(), std::move(voxelsFromOrientation(translated_orientation)), idx);
+
                     m_bricks.push_back(brick);
 
                     for (std::shared_ptr<Voxel> orientation_voxel : brick->location()) {
@@ -115,9 +120,11 @@ Preprocessor::translateOrientation(
     )
 {
     std::vector<glm::vec3> real_orientation;
+
     for (const glm::vec3& voxel_position : orientation) {
         real_orientation.push_back(glm::vec3(voxel.x + voxel_position.x, voxel.y + voxel_position.y, voxel.z + voxel_position.z));
     }
+
     return real_orientation;
 }
 
@@ -179,22 +186,6 @@ Preprocessor::print(std::ostream& os)
             std::cerr << " v" << voxel->index << ", ";
         }
         std::cerr << ")" << std::endl;
-    }
-
-    std::cerr << "wtf:" << std::endl;
-
-    for (size_t i = 0; i < m_bricks.size(); ++i) {
-        std::shared_ptr<Brick> brick = m_bricks[i];
-        std::cerr << "b" << brick->id() << " -> ";
-        for (std::shared_ptr<Voxel> voxel : brick->location()) {
-            std::cerr << "[[" << glm_helpers::to_int_string(voxel->position) << "]]";
-            for (std::shared_ptr<Brick> conflicted_brick : m_overlappingBricks[voxel->index]) {
-                if (brick->id() != conflicted_brick->id()) {
-                    std::cerr << " + b" << conflicted_brick->id();
-                }
-            }
-        }
-        std::cerr << std::endl;
     }
 
     std::cerr << "conflicts: " << std::endl;
