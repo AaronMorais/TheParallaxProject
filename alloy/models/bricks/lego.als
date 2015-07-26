@@ -1,3 +1,7 @@
+abstract sig Brick {
+  location : one BrickLocation
+}
+
 -- a set comprehension to tell us which bricks are connected to which others
 fun connected[] : Brick->Brick {
   {b1, b2 : Brick | connected[b1,b2] && b1 != b2 }
