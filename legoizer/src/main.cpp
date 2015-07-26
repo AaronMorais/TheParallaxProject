@@ -15,8 +15,8 @@ void printError(
     std::cerr << "-Output <filename>    output file (if none, to cout)" << std::endl;
     std::cerr << "-Materials <filepath> materials path for input .obj " << std::endl;
     std::cerr << "-voxelize             voxelize .obj input" << std::endl;
-    std::cerr << "-allow                write as allow model" << std::endl;
-    std::cerr << "-alloy_old            write as alloy model (deprecated)" << std::endl;
+    std::cerr << "-preprocess           preprocess .obj input for alloy" << std::endl;
+    std::cerr << "-alloy                write as alloy model (deprecated)" << std::endl;
     std::cerr << "-obj                  write as obj model" << std::endl;
     std::cerr << "-subdivisions <int>   number of subdivisions" << std::endl;
     std::cerr << "-fill                 fill the voxel model" << std::endl;
@@ -37,7 +37,6 @@ main(
     bool should_voxelize = false;
     bool should_preprocess = false;
     bool should_print_alloy = false;
-    bool should_print_alloy_old = false;
     bool should_print_obj = false;
 
     std::string file_name;
@@ -56,11 +55,10 @@ main(
         } else if (strcmp(argv[i], "-voxelize") == 0) {
             should_voxelize = true;
         } else if (strcmp(argv[i], "-preprocess") == 0) {
+            should_voxelize = true;
             should_preprocess = true;
         } else if (strcmp(argv[i], "-alloy") == 0) {
             should_print_alloy = true;
-        } else if (strcmp(argv[i], "-alloy_old") == 0) {
-            should_print_alloy_old = true;
         } else if (strcmp(argv[i], "-alloy_obj") == 0) {
             should_print_obj = true;
         } else if (strcmp(argv[i], "-fill") == 0) {
@@ -93,13 +91,12 @@ main(
         }
     }
 
-
-    if (should_print_alloy) {
-        legoizer->writeAlloy(*os);
-    } else if (should_print_alloy_old) {
-        legoizer->writeAlloyOld(*os);
+    if (should_voxelize && should_preprocess) {
+        legoizer->printProcessed(*os);
+    } else if (should_print_alloy) {
+        legoizer->printAlloy(*os);
     } else if (should_print_obj) {
-        legoizer->writeObj(*os);
+        legoizer->printObj(*os);
     }
 
     std::cerr << "Completed" << std::endl;

@@ -1,269 +1,264 @@
 #include "preprocessor.h"
-#include "glm/ext.hpp"
+#include "utilities/glm_helpers.h"
 
 #include <iostream>
+#include <iterator>
+#include <map>
+
 namespace plx {
 
 Preprocessor::Preprocessor(std::shared_ptr<plx::LegoData> data) :
-    m_data(data)
+    m_data(data),
+    m_min(INT_MAX, INT_MAX, INT_MAX),
+    m_max(INT_MIN, INT_MIN, INT_MIN)
 {
 }
 
 void
 Preprocessor::process()
 {
-    std::vector<glm::vec3>& model = m_data->voxels();
+    std::vector<glm::vec3>& voxels = m_data->voxels();
 
-    glm::vec3 min(INT_MAX, INT_MAX, INT_MAX);
-    glm::vec3 max(INT_MIN, INT_MIN, INT_MIN);
-
-    for (const glm::vec3& voxel : model) {
-        if (voxel.x > max.x) {
-            max.x = voxel.x;
+    for (const glm::vec3& voxel : voxels) {
+        if (voxel.x > m_max.x) {
+            m_max.x = voxel.x;
         }
-        if (voxel.y > max.y) {
-            max.y = voxel.y;
+        if (voxel.y > m_max.y) {
+            m_max.y = voxel.y;
         }
-        if (voxel.z > max.z) {
-            max.z = voxel.z;
+        if (voxel.z > m_max.z) {
+            m_max.z = voxel.z;
         }
 
-        if (voxel.x < min.x) {
-            min.x = voxel.x;
+        if (voxel.x < m_min.x) {
+            m_min.x = voxel.x;
         }
-        if (voxel.y < min.y) {
-            min.y = voxel.y;
+        if (voxel.y < m_min.y) {
+            m_min.y = voxel.y;
         }
-        if (voxel.z < min.z) {
-            min.z = voxel.z;
+        if (voxel.z < m_min.z) {
+            m_min.z = voxel.z;
         }
     }
 
-    glm::vec3 dimensions((max.x - min.x) + 1, (max.y - min.y) + 1, (max.z - min.z) + 1);
+    m_dimensions = std::move(glm::vec3((m_max.x - m_min.x) + 1, (m_max.y - m_min.y) + 1, (m_max.z - m_min.z) + 1));
 
-    std::cout << "min:" << glm::to_string(min) << std::endl;
-    std::cout << "max:" << glm::to_string(max) << std::endl;
-    std::cout << "dim:" << glm::to_string(dimensions) << std::endl;
-    std::cout << "voxels: " << model.size() << std::endl;
+    m_grid = std::move(
+        std::vector<std::vector<std::vector<size_t>>>(
+            m_dimensions.x,
+            std::vector<std::vector<size_t>>(
+                m_dimensions.y,
+                std::vector<size_t>(m_dimensions.z, 0)
+            )
+        )
+    );
 
-    std::vector<Position> brick_locations;
-    processLocations(brick_locations, model, dimensions);
+    std::cerr << "min:" << glm::to_string(m_min) << std::endl;
+    processVoxels(voxels);
+    std::cerr << "max:" << glm::to_string(m_max) << std::endl;
+    processBricks(voxels);
 
-    unsigned int index = 0;
-    for (const Position& pos : brick_locations) {
-        std::cout << "b" << index << ": ";
-        for (const glm::vec3& p : pos.location.byVoxel) {
-            std::cout << "(" << (size_t)p.x << "," << (size_t)p.y << "," << (size_t)p.z << ")";
-        }
-        std::cout << std::endl;
-
-        std::cout << "b" << index << " -> (";
-        for (const unsigned int p : pos.location.byVoxelIndex) {
-            std::cout << " v" << p << " ";
-        }
-        std::cout << ")" << std::endl;
-
-        index++;
-    }
-
-    std::cout << "brick_locations: " << brick_locations.size() << std::endl;
-
-    std::cout << "conflicts: " << std::endl;
-    unsigned int num_conflicts = 0;
-    std::vector<std::vector<unsigned int>> brick_conflicts;
-    processConflicts(brick_conflicts, brick_locations);
-    for (unsigned int location_index = 0; location_index < brick_conflicts.size(); ++location_index) {
-        num_conflicts += brick_conflicts[location_index].size();
-        std::cout << "b" << location_index << " -> b" << brick_conflicts[location_index][0];
-        for (unsigned int conflict_index = 1; conflict_index < brick_conflicts[location_index].size(); ++conflict_index) {
-            std::cout << " + b" << brick_conflicts[location_index][conflict_index];
-        }
-        std::cout << std::endl;
-    }
-    std::cout << num_conflicts << " conflicts for " << brick_conflicts.size() << " bricks" << std::endl;
+    std::cerr << "dim:" << glm::to_string(m_dimensions) << std::endl;
+    std::cerr << "#bricks: " << m_bricks.size() << std::endl;
 }
 
 void
-Preprocessor::processLocations(std::vector<Preprocessor::Position>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions)
+Preprocessor::processVoxels(
+    const std::vector<glm::vec3>& voxels
+    )
 {
-    std::vector<std::vector<std::vector<size_t>>> grid =
-        std::vector<std::vector<std::vector<size_t>>>(dimensions.x,
-        std::vector<std::vector<size_t>>(dimensions.y,
-        std::vector<size_t>(dimensions.z, 0)));
+    // 1-indexed because grid is unsigned and 0 is reserved for empty voxels
+    for (size_t i = 0; i < voxels.size(); i++) {
+        const glm::vec3& voxel = voxels[i];
 
-    unsigned int voxel_index = 1;
-    //1-indexed because grid is unsigned and 0 is reserved for off-voxels
-    for (const glm::vec3& voxel : model) {
-        grid[(size_t)(voxel.x)][(size_t)(voxel.y)][(size_t)(voxel.z)] = voxel_index;
-        voxel_index++;
+        m_grid[(size_t)voxel.x][(size_t)voxel.y][(size_t)voxel.z] = (i+1);
+        m_voxels[(i+1)] = std::make_shared<Voxel>(voxel, (i+1));
     }
+}
 
-    std::vector<std::pair<std::vector<std::vector<glm::vec3>>, std::string>> all_orientations;
-    all_orientations.push_back(std::make_pair(OneOnePlate::orientations(), OneOnePlate::name()));
-    all_orientations.push_back(std::make_pair(OneTwoPlate::orientations(), OneTwoPlate::name()));
-    all_orientations.push_back(std::make_pair(OneFourPlate::orientations(), OneFourPlate::name()));
+void
+Preprocessor::processBricks(
+    const std::vector<glm::vec3>& voxels
+    )
+{
 
-    for (const glm::vec3& voxel : model) {
+    size_t idx = 1;
+    for (const glm::vec3& voxel : voxels) {
 
-        for (const std::pair<std::vector<std::vector<glm::vec3>>, std::string>& brick_orientation : all_orientations) {
+        for (const std::vector<glm::vec3>& unit_orientation : OneOnePlate::orientations()) {
 
-            for (const std::vector<glm::vec3>& orientation : brick_orientation.first) {
+            std::vector<glm::vec3> translated_orientation = translateOrientation(voxel, unit_orientation);
+            if (orientationFits(translated_orientation)) {
+                std::vector<std::shared_ptr<Voxel>> voxel_orientation = getVoxelsFromOrientation(translated_orientation);
 
+                std::shared_ptr<Brick> brick = std::make_shared<OneOnePlate>(voxel_orientation, idx);
+                m_bricks.push_back(brick);
+                m_potentialBricks[index(voxel)].push_back(brick);
 
-                Location real_location;
-                for (const glm::vec3& voxel_position : orientation) {
-                    real_location.byVoxel.push_back(glm::vec3(voxel.x + voxel_position.x, voxel.y + voxel_position.y, voxel.z + voxel_position.z));
-                }
+                idx++;
+            }
+        }
 
-                bool fits = true;
-                for (const glm::vec3& voxel_position : real_location.byVoxel) {
-                    if (voxel_position.x >= dimensions.x ||
-                        voxel_position.y >= dimensions.y ||
-                        voxel_position.z >= dimensions.z ||
-                        grid[voxel_position.x][voxel_position.y][voxel_position.z] == 0) {
-                        fits = false;
-                    } else {
-                        //grid is 1-indexed so need to offset
-                        real_location.byVoxelIndex.push_back(grid[voxel_position.x][voxel_position.y][voxel_position.z] - 1);
-                    }
-                }
+        for (const std::vector<glm::vec3>& unit_orientation : OneTwoPlate::orientations()) {
+            std::vector<glm::vec3> translated_orientation = translateOrientation(voxel, unit_orientation);
+            if (orientationFits(translated_orientation)) {
+                std::vector<std::shared_ptr<Voxel>> voxel_orientation = getVoxelsFromOrientation(translated_orientation);
 
-                if (fits) {
-                    Position position;
-                    position.location = real_location;
-                    position.brick_type = brick_orientation.second;
-                    brick_locations.push_back(position);
-                }
+                std::shared_ptr<Brick> brick = std::make_shared<OneTwoPlate>(voxel_orientation, idx);
+                m_bricks.push_back(brick);
+                m_potentialBricks[index(voxel)].push_back(brick);
+
+                idx++;
+            }
+        }
+
+        for (const std::vector<glm::vec3>& unit_orientation : OneFourPlate::orientations()) {
+            std::vector<glm::vec3> translated_orientation = translateOrientation(voxel, unit_orientation);
+            if (orientationFits(translated_orientation)) {
+                std::vector<std::shared_ptr<Voxel>> voxel_orientation = getVoxelsFromOrientation(translated_orientation);
+
+                std::shared_ptr<Brick> brick = std::make_shared<OneFourPlate>(voxel_orientation, idx);
+                m_bricks.push_back(brick);
+                m_potentialBricks[index(voxel)].push_back(brick);
+
+                idx++;
             }
         }
     }
 }
 
-void
-Preprocessor::processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<Preprocessor::Position>& brick_locations)
+std::vector<glm::vec3>
+Preprocessor::translateOrientation(
+    const glm::vec3& voxel,
+    const std::vector<glm::vec3>& orientation
+    )
 {
-    for (const Position& location_i : brick_locations) {
-        unsigned int index = 0;
-        std::vector<unsigned int> conflicts;
-        for (const Position& location_j : brick_locations) {
-            if (&location_i != &location_j) {
-                bool conflict = false;
-                for (const glm::vec3& voxel_i : location_i.location.byVoxel) {
-                    if (conflict) break;
-                    for (const glm::vec3& voxel_j : location_j.location.byVoxel) {
-                        if (conflict) break;
-                        if (voxel_i == voxel_j) {
-                            conflict = true;
-                            conflicts.push_back(index);
+    std::vector<glm::vec3> real_orientation;
+    for (const glm::vec3& voxel_position : orientation) {
+        real_orientation.push_back(glm::vec3(voxel.x + voxel_position.x, voxel.y + voxel_position.y, voxel.z + voxel_position.z));
+    }
+    return real_orientation;
+}
+
+bool
+Preprocessor::orientationFits(
+    const std::vector<glm::vec3>& real_orientation
+    )
+{
+    bool fits = true;
+    for (const glm::vec3& voxel : real_orientation) {
+        if (voxel.x >= m_dimensions.x ||
+            voxel.y >= m_dimensions.y ||
+            voxel.z >= m_dimensions.z ||
+            index(voxel) == 0
+        ) {
+            fits = false;
+        }
+    }
+
+    return fits;
+}
+
+std::vector<std::shared_ptr<Voxel>>
+Preprocessor::getVoxelsFromOrientation(
+    const std::vector<glm::vec3>& real_orientation
+    )
+{
+    std::vector<std::shared_ptr<Voxel>> voxel_orientation;
+
+    for (const glm::vec3& real_voxel : real_orientation) {
+        voxel_orientation.push_back(m_voxels[index(real_voxel)]);
+    }
+
+    return voxel_orientation;
+}
+
+size_t
+Preprocessor::index(
+    const glm::vec3& voxel
+    )
+{
+    return m_grid[(size_t)voxel.x][(size_t)voxel.y][(size_t)voxel.z];
+}
+
+void
+Preprocessor::print(std::ostream& os)
+{
+    for (size_t i = 0; i < m_bricks.size(); i++) {
+        std::shared_ptr<Brick> brick = m_bricks[i];
+
+        std::cerr << "b" << brick->id() << ": ";
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            std::cerr << glm_helpers::to_int_string(voxel->position) << ", ";
+        }
+        std::cerr << std::endl;
+
+        std::cerr << "b" << brick->id() << " -> (";
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            std::cerr << " v" << voxel->grid_index << ", ";
+        }
+        std::cerr << ")" << std::endl;
+    }
+
+    std::cerr << "conflicts: " << std::endl;
+
+    size_t num_conflicts = 0;
+    for (size_t i = 0; i < m_bricks.size(); ++i) {
+        std::shared_ptr<Brick> brick = m_bricks[i];
+        std::cerr << "b" << brick->id() << " -> ";
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            for (std::shared_ptr<Brick> conflicted_brick : m_potentialBricks[voxel->grid_index]) {
+                if (brick->id() != conflicted_brick->id()) {
+                    std::cerr << " + b" << conflicted_brick->id();
+                    num_conflicts += 1;
+                }
+            }
+        }
+        std::cerr << std::endl;
+    }
+
+    std::cerr << num_conflicts << " conflicts for " << m_bricks.size() << " bricks" << std::endl;
+
+    std::cerr << "connected: " << std::endl;
+    for (size_t i = 0; i < m_bricks.size(); ++i) {
+
+        std::shared_ptr<Brick> current_brick = m_bricks[i];
+
+        std::cerr << "b" << current_brick->id() << " -> ";
+
+        for (std::shared_ptr<Voxel> voxel : current_brick->location()) {
+
+            if ((size_t)voxel->position.y + 1 < m_dimensions.y) {
+                size_t voxel_above = m_grid[(size_t)voxel->position.x][(size_t)voxel->position.y + 1][(size_t)voxel->position.z];
+                if (voxel_above != 0) {
+                    for (std::shared_ptr<Brick> above_brick : m_potentialBricks[voxel_above]) {
+                        if (current_brick->id() != above_brick->id()) {
+                            std::cerr << " + b" << above_brick->id();
                         }
                     }
                 }
             }
-            index++;
-        }
-        brick_conflicts.push_back(conflicts);
-    }
-}
 
+            if ((size_t)voxel->position.y > 0) {
+                size_t voxel_below = m_grid[(size_t)voxel->position.x][(size_t)voxel->position.y - 1][(size_t)voxel->position.z];
+                if (voxel_below != 0) {
+                    for (std::shared_ptr<Brick> above_brick : m_potentialBricks[voxel_below]) {
+                        if (current_brick->id() != above_brick->id()) {
+                            std::cerr << " + b" << above_brick->id();
+                        }
+                    }
+                }
+            }
+        }
+        std::cerr << std::endl;
+    }
+
+}
 
 std::shared_ptr<plx::LegoData>
 Preprocessor::data()
 {
     return m_data;
 }
-
-
-const std::vector<glm::vec3>&
-Preprocessor::Brick::location() const
-{
-    return m_location;
-}
-
-Preprocessor::OneOnePlate::OneOnePlate(const std::vector<glm::vec3>& location)
-{
-    m_location = location;
-}
-
-const std::string
-Preprocessor::OneOnePlate::name()
-{
-    return "OneOnePlate";
-}
-const std::vector<std::vector<glm::vec3>>&
-Preprocessor::OneOnePlate::orientations()
-{
-    if (OneOnePlate::m_orientations.empty()) {
-        std::vector<glm::vec3> orientation1;
-        orientation1.push_back(glm::vec3(0, 0, 0));
-        OneOnePlate::m_orientations.push_back(orientation1);
-    }
-    return OneOnePlate::m_orientations;
-}
-
-std::vector<std::vector<glm::vec3>> Preprocessor::OneOnePlate::m_orientations;
-
-
-Preprocessor::OneTwoPlate::OneTwoPlate(const std::vector<glm::vec3>& location)
-{
-    m_location = location;
-}
-
-const std::string
-Preprocessor::OneTwoPlate::name()
-{
-    return "OneTwoPlate";
-}
-
-const std::vector<std::vector<glm::vec3>>&
-Preprocessor::OneTwoPlate::orientations()
-{
-    if (OneTwoPlate::m_orientations.empty()) {
-        std::vector<glm::vec3> orientation1;
-        orientation1.push_back(glm::vec3(0, 0, 0));
-        orientation1.push_back(glm::vec3(0, 0, 1));
-        OneTwoPlate::m_orientations.push_back(orientation1);
-        std::vector<glm::vec3> orientation2;
-        orientation2.push_back(glm::vec3(0, 0, 0));
-        orientation2.push_back(glm::vec3(1, 0, 0));
-        OneTwoPlate::m_orientations.push_back(orientation2);
-    }
-    return OneTwoPlate::m_orientations;
-}
-
-std::vector<std::vector<glm::vec3>> Preprocessor::OneTwoPlate::m_orientations;
-
-
-Preprocessor::OneFourPlate::OneFourPlate(const std::vector<glm::vec3>& location)
-{
-    m_location = location;
-}
-
-const std::string
-Preprocessor::OneFourPlate::name()
-{
-    return "OneFourPlate";
-}
-
-const std::vector<std::vector<glm::vec3>>&
-Preprocessor::OneFourPlate::orientations()
-{
-    if (OneFourPlate::m_orientations.empty()) {
-        std::vector<glm::vec3> orientation1;
-        orientation1.push_back(glm::vec3(0, 0, 0));
-        orientation1.push_back(glm::vec3(0, 0, 1));
-        orientation1.push_back(glm::vec3(0, 0, 2));
-        orientation1.push_back(glm::vec3(0, 0, 3));
-        OneFourPlate::m_orientations.push_back(orientation1);
-        std::vector<glm::vec3> orientation2;
-        orientation2.push_back(glm::vec3(0, 0, 0));
-        orientation2.push_back(glm::vec3(1, 0, 0));
-        orientation2.push_back(glm::vec3(2, 0, 0));
-        orientation2.push_back(glm::vec3(3, 0, 0));
-        OneFourPlate::m_orientations.push_back(orientation2);
-    }
-    return OneFourPlate::m_orientations;
-}
-
-std::vector<std::vector<glm::vec3>> Preprocessor::OneFourPlate::m_orientations;
 
 }

@@ -1,6 +1,4 @@
 #include "legoizer.h"
-#include "voxelizer.h"
-#include "preprocessor.h"
 
 namespace plx {
 
@@ -14,33 +12,31 @@ Legoizer::Legoizer(std::shared_ptr<tinyobj::ObjData> obj_data) :
 
 void Legoizer::voxelize()
 {
-    std::shared_ptr<plx::Voxelizer> voxelizer = std::make_shared<plx::Voxelizer>(m_data);
-
-    voxelizer->voxelize();
+    m_voxelizer = std::make_shared<plx::Voxelizer>(m_data);
+    m_voxelizer->voxelize();
 }
 
 void Legoizer::preprocess()
 {
-    std::shared_ptr<plx::Preprocessor> preprocessor = std::make_shared<plx::Preprocessor>(m_data);
-
-    preprocessor->process();
+    m_preprocessor = std::make_shared<plx::Preprocessor>(m_data);
+    m_preprocessor->process();
 }
 
-void Legoizer::writeObj(
+void Legoizer::printObj(
     std::ostream& os
     )
 {
     m_data->printObj(os);
 }
 
-void Legoizer::writeAlloy(
+void Legoizer::printProcessed(
     std::ostream& os
     )
 {
-
+    m_preprocessor->print(os);
 }
 
-void Legoizer::writeAlloyOld(
+void Legoizer::printAlloy(
     std::ostream& os
     )
 {

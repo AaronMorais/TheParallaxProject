@@ -1,5 +1,7 @@
 #include "glm_helpers.h"
 
+#include <sstream>
+
 namespace plx {
 namespace glm_helpers {
 
@@ -16,6 +18,14 @@ midpoint(
     );
 }
 
+std::string
+to_int_string(const glm::vec3& v)
+{
+    std::stringstream ss;
+    ss << "(" << (int)v.x << "," << (int)v.y << "," << (int)v.z << ")";
+    return ss.str();
+}
+
 std::ostream& operator<< (std::ostream& out, const std::vector<glm::vec3>& list)
 {
     for (const glm::vec3& v : list) {
@@ -23,7 +33,6 @@ std::ostream& operator<< (std::ostream& out, const std::vector<glm::vec3>& list)
     }
     return out;
 }
-
 
 std::ostream& operator<< (std::ostream& out, const std::vector<std::vector<std::vector<size_t>>>& grid)
 {

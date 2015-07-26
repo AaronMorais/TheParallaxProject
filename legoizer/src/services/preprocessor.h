@@ -2,6 +2,9 @@
 #define _PREPROCESSOR_H__
 
 #include "lego_data.h"
+#include "bricks.h"
+
+#include <iostream>
 
 namespace plx {
 
@@ -10,57 +13,43 @@ public:
     Preprocessor(std::shared_ptr<plx::LegoData> data);
 
     void process();
-
-    struct Location {
-        std::vector<glm::vec3> byVoxel;
-        std::vector<unsigned int> byVoxelIndex;
-    };
-
-    struct Position {
-        Location location;
-        std::string brick_type;
-    };
+    void print(std::ostream& o);
 
     std::shared_ptr<plx::LegoData> data();
 
-    class Brick {
-    public:
-        const std::vector<glm::vec3>& location() const;
-    protected:
-        std::vector<glm::vec3> m_location;
-    };
-
-    class OneOnePlate : public Brick {
-    public:
-        OneOnePlate(const std::vector<glm::vec3>& location);
-        static const std::vector<std::vector<glm::vec3>>& orientations();
-        static const std::string name();
-    private:
-        static std::vector<std::vector<glm::vec3>> m_orientations;
-    };
-
-    class OneTwoPlate : public Brick {
-    public:
-        OneTwoPlate(const std::vector<glm::vec3>& location);
-        static const std::vector<std::vector<glm::vec3>>& orientations();
-        static const std::string name();
-    private:
-        static std::vector<std::vector<glm::vec3>> m_orientations;
-    };
-
-    class OneFourPlate : public Brick {
-    public:
-        OneFourPlate(const std::vector<glm::vec3>& location);
-        static const std::vector<std::vector<glm::vec3>>& orientations();
-        static const std::string name();
-    private:
-        static std::vector<std::vector<glm::vec3>> m_orientations;
-    };
-
 private:
     std::shared_ptr<plx::LegoData> m_data;
-    void processLocations(std::vector<Position>& brick_locations, const std::vector<glm::vec3>& model, glm::vec3 dimensions);
-    void processConflicts(std::vector<std::vector<unsigned int>>& brick_conflicts, const std::vector<Position>& brick_locations);
+
+    glm::vec3 m_min;
+    glm::vec3 m_max;
+    glm::vec3 m_dimensions;
+
+    std::vector<std::shared_ptr<Brick>> m_bricks;
+    std::vector<std::vector<std::shared_ptr<Brick>>> m_conflicts;
+    std::vector<std::vector<std::vector<size_t>>> m_grid;
+    std::map<size_t, std::shared_ptr<Voxel>> m_voxels;
+    std::map<size_t, std::vector<std::shared_ptr<Brick>>> m_potentialBricks;
+
+    void processVoxels(
+        const std::vector<glm::vec3>& voxels
+        );
+    void processBricks(
+        const std::vector<glm::vec3>& voxels
+        );
+
+    std::vector<glm::vec3> translateOrientation(
+        const glm::vec3& voxel,
+        const std::vector<glm::vec3>& orientation
+        );
+    std::vector<std::shared_ptr<Voxel>> getVoxelsFromOrientation(
+        const std::vector<glm::vec3>& real_orientation
+        );
+    bool orientationFits(
+        const std::vector<glm::vec3>& real_orientation
+        );
+    size_t index(
+        const glm::vec3& voxel
+        );
 };
 
 }

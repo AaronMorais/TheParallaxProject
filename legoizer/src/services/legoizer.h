@@ -2,6 +2,8 @@
 #define _LEGOIZER_H__
 
 #include "lego_data.h"
+#include "voxelizer.h"
+#include "preprocessor.h"
 
 namespace plx {
 
@@ -12,14 +14,17 @@ public:
     void voxelize();
     void preprocess();
 
-    void writeAlloy(std::ostream& os);
-    void writeAlloyOld(std::ostream& os);
-    void writeObj(std::ostream& os);
+    void printProcessed(std::ostream& os);
+    void printAlloy(std::ostream& os);
+    void printObj(std::ostream& os);
 
     std::shared_ptr<plx::LegoData> data();
 
     static size_t subdivisions;
     static bool shouldFillShell;
+
+    std::shared_ptr<plx::Voxelizer> m_voxelizer;
+    std::shared_ptr<plx::Preprocessor> m_preprocessor;
 
 private:
     std::shared_ptr<plx::LegoData> m_data;
