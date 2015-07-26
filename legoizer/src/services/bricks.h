@@ -18,7 +18,11 @@ public:
     const std::vector<std::shared_ptr<Voxel>>& location() const;
     const size_t& id() const;
 
-    virtual const std::string name() const = 0;
+    class Factory {
+    public:
+        static std::shared_ptr<Brick> create(const std::string brick_type, const std::vector<std::shared_ptr<Voxel>>& location, const size_t& id);
+    };
+
 protected:
     std::vector<std::shared_ptr<Voxel>> m_location;
     size_t m_id;
@@ -27,7 +31,8 @@ protected:
 class OneOnePlate : public Brick {
 public:
     OneOnePlate(const std::vector<std::shared_ptr<Voxel>>& location, const size_t id);
-    const std::string name() const;
+
+    static constexpr const char* name = "OneOnePlate";
 
     static const std::vector<std::vector<glm::vec3>> orientations();
     static const std::vector<std::vector<glm::vec3>> aboveConnections();
@@ -37,7 +42,8 @@ public:
 class OneTwoPlate : public Brick {
 public:
     OneTwoPlate(const std::vector<std::shared_ptr<Voxel>>& location, const size_t id);
-    const std::string name() const;
+
+    static constexpr const char* name = "OneTwoPlate";
 
     static const std::vector<std::vector<glm::vec3>> orientations();
     static const std::vector<std::vector<glm::vec3>> aboveConnections();
@@ -47,7 +53,8 @@ public:
 class OneFourPlate : public Brick {
 public:
     OneFourPlate(const std::vector<std::shared_ptr<Voxel>>& location, const size_t id);
-    const std::string name() const;
+
+    static constexpr const char* name = "OneFourPlate";
 
     static const std::vector<std::vector<glm::vec3>> orientations();
     static const std::vector<std::vector<glm::vec3>> aboveConnections();

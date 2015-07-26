@@ -28,14 +28,10 @@ private:
     std::vector<std::vector<std::shared_ptr<Brick>>> m_conflicts;
     std::vector<std::vector<std::vector<size_t>>> m_grid;
     std::map<size_t, std::shared_ptr<Voxel>> m_voxels;
-    std::map<size_t, std::vector<std::shared_ptr<Brick>>> m_potentialBricks;
+    std::map<size_t, std::vector<std::shared_ptr<Brick>>> m_overlappingBricks;
 
-    void processVoxels(
-        const std::vector<glm::vec3>& voxels
-        );
-    void processBricks(
-        const std::vector<glm::vec3>& voxels
-        );
+    void processVoxels(const std::vector<glm::vec3>& voxels );
+    void processBricks(const std::vector<glm::vec3>& voxels );
 
     std::vector<glm::vec3> translateOrientation(
         const glm::vec3& voxel,
@@ -44,12 +40,8 @@ private:
     std::vector<std::shared_ptr<Voxel>> voxelsFromOrientation(
         const std::vector<glm::vec3>& real_orientation
         );
-    bool orientationFits(
-        const std::vector<glm::vec3>& real_orientation
-        );
-    size_t index(
-        const glm::vec3& voxel
-        );
+    bool orientationFits(const std::vector<glm::vec3>& real_orientation);
+    size_t index(const glm::vec3& voxel);
 };
 
 }

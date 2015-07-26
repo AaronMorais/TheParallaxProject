@@ -25,6 +25,25 @@ Brick::Brick(const std::vector<std::shared_ptr<Voxel>>& location, const size_t& 
     m_location = location;
 }
 
+std::shared_ptr<Brick>
+Brick::Factory::create(
+    const std::string brick_type,
+    const std::vector<std::shared_ptr<Voxel>>& location,
+    const size_t& id
+    )
+{
+    std::shared_ptr<Brick> brick;
+    if (brick_type == OneOnePlate::name) {
+        brick = std::make_shared<OneOnePlate>(std::move(location), id);
+    } else if (brick_type == OneTwoPlate::name) {
+        brick = std::make_shared<OneTwoPlate>(std::move(location), id);
+    } else if (brick_type == OneFourPlate::name) {
+        brick = std::make_shared<OneFourPlate>(std::move(location), id);
+    }
+    return brick;
+}
+
+
 OneOnePlate::OneOnePlate(const std::vector<std::shared_ptr<Voxel>>& location, const size_t id)
     : Brick(location, id)
 {
@@ -38,12 +57,6 @@ OneOnePlate::orientations()
     orientation_1.push_back(glm::vec3(0, 0, 0));
     orientations.push_back(orientation_1);
     return orientations;
-}
-
-const std::string
-OneOnePlate::name() const
-{
-    return "OneOnePlate";
 }
 
 OneTwoPlate::OneTwoPlate(const std::vector<std::shared_ptr<Voxel>>& location, const size_t id)
@@ -64,12 +77,6 @@ OneTwoPlate::orientations()
     orientation_2.push_back(glm::vec3(1, 0, 0));
     orientations.push_back(orientation_2);
     return orientations;
-}
-
-const std::string
-OneTwoPlate::name() const
-{
-    return "OneTwoPlate";
 }
 
 OneFourPlate::OneFourPlate(const std::vector<std::shared_ptr<Voxel>>& location, const size_t id)
@@ -94,12 +101,6 @@ OneFourPlate::orientations()
     orientation_2.push_back(glm::vec3(3, 0, 0));
     orientations.push_back(orientation_2);
     return orientations;
-}
-
-const std::string
-OneFourPlate::name() const
-{
-    return "OneFourPlate";
 }
 
 }
