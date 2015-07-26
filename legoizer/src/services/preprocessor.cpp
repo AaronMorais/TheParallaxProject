@@ -53,11 +53,11 @@ Preprocessor::process()
         )
     );
 
-    std::cerr << "min:" << glm::to_string(m_min) << std::endl;
     processVoxels(voxels);
-    std::cerr << "max:" << glm::to_string(m_max) << std::endl;
     processBricks(voxels);
 
+    std::cerr << "min:" << glm::to_string(m_min) << std::endl;
+    std::cerr << "max:" << glm::to_string(m_max) << std::endl;
     std::cerr << "dim:" << glm::to_string(m_dimensions) << std::endl;
     std::cerr << "#bricks: " << m_bricks.size() << std::endl;
 }
@@ -70,9 +70,10 @@ Preprocessor::processVoxels(
     // 1-indexed because grid is unsigned and 0 is reserved for empty voxels
     for (size_t i = 0; i < voxels.size(); i++) {
         const glm::vec3& voxel = voxels[i];
+        size_t idx = i+1;
 
-        m_grid[(size_t)voxel.x][(size_t)voxel.y][(size_t)voxel.z] = (i+1);
-        m_voxels[(i+1)] = std::make_shared<Voxel>(voxel, (i+1));
+        m_grid[(size_t)voxel.x][(size_t)voxel.y][(size_t)voxel.z] = idx;
+        m_voxels[idx] = std::make_shared<Voxel>(voxel, idx);
     }
 }
 
@@ -81,17 +82,12 @@ Preprocessor::processBricks(
     const std::vector<glm::vec3>& voxels
     )
 {
-
     size_t idx = 1;
     for (const glm::vec3& voxel : voxels) {
-
         for (const std::vector<glm::vec3>& unit_orientation : OneOnePlate::orientations()) {
-
             std::vector<glm::vec3> translated_orientation = translateOrientation(voxel, unit_orientation);
             if (orientationFits(translated_orientation)) {
-                std::vector<std::shared_ptr<Voxel>> voxel_orientation = getVoxelsFromOrientation(translated_orientation);
-
-                std::shared_ptr<Brick> brick = std::make_shared<OneOnePlate>(voxel_orientation, idx);
+                std::shared_ptr<Brick> brick = std::make_shared<OneOnePlate>(std::move(voxelsFromOrientation(translated_orientation)), idx);
                 m_bricks.push_back(brick);
                 m_potentialBricks[index(voxel)].push_back(brick);
 
@@ -102,9 +98,7 @@ Preprocessor::processBricks(
         for (const std::vector<glm::vec3>& unit_orientation : OneTwoPlate::orientations()) {
             std::vector<glm::vec3> translated_orientation = translateOrientation(voxel, unit_orientation);
             if (orientationFits(translated_orientation)) {
-                std::vector<std::shared_ptr<Voxel>> voxel_orientation = getVoxelsFromOrientation(translated_orientation);
-
-                std::shared_ptr<Brick> brick = std::make_shared<OneTwoPlate>(voxel_orientation, idx);
+                std::shared_ptr<Brick> brick = std::make_shared<OneTwoPlate>(std::move(voxelsFromOrientation(translated_orientation)), idx);
                 m_bricks.push_back(brick);
                 m_potentialBricks[index(voxel)].push_back(brick);
 
@@ -115,9 +109,7 @@ Preprocessor::processBricks(
         for (const std::vector<glm::vec3>& unit_orientation : OneFourPlate::orientations()) {
             std::vector<glm::vec3> translated_orientation = translateOrientation(voxel, unit_orientation);
             if (orientationFits(translated_orientation)) {
-                std::vector<std::shared_ptr<Voxel>> voxel_orientation = getVoxelsFromOrientation(translated_orientation);
-
-                std::shared_ptr<Brick> brick = std::make_shared<OneFourPlate>(voxel_orientation, idx);
+                std::shared_ptr<Brick> brick = std::make_shared<OneFourPlate>(std::move(voxelsFromOrientation(translated_orientation)), idx);
                 m_bricks.push_back(brick);
                 m_potentialBricks[index(voxel)].push_back(brick);
 
@@ -160,7 +152,7 @@ Preprocessor::orientationFits(
 }
 
 std::vector<std::shared_ptr<Voxel>>
-Preprocessor::getVoxelsFromOrientation(
+Preprocessor::voxelsFromOrientation(
     const std::vector<glm::vec3>& real_orientation
     )
 {
@@ -195,7 +187,7 @@ Preprocessor::print(std::ostream& os)
 
         std::cerr << "b" << brick->id() << " -> (";
         for (std::shared_ptr<Voxel> voxel : brick->location()) {
-            std::cerr << " v" << voxel->grid_index << ", ";
+            std::cerr << " v" << voxel->index << ", ";
         }
         std::cerr << ")" << std::endl;
     }
@@ -207,7 +199,7 @@ Preprocessor::print(std::ostream& os)
         std::shared_ptr<Brick> brick = m_bricks[i];
         std::cerr << "b" << brick->id() << " -> ";
         for (std::shared_ptr<Voxel> voxel : brick->location()) {
-            for (std::shared_ptr<Brick> conflicted_brick : m_potentialBricks[voxel->grid_index]) {
+            for (std::shared_ptr<Brick> conflicted_brick : m_potentialBricks[voxel->index]) {
                 if (brick->id() != conflicted_brick->id()) {
                     std::cerr << " + b" << conflicted_brick->id();
                     num_conflicts += 1;

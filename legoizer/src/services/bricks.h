@@ -8,12 +8,8 @@ namespace plx {
 
 struct Voxel {
     glm::vec3 position;
-    size_t grid_index;
-
-    Voxel(const glm::vec3& position, const size_t& index) {
-        this->position = position;
-        this->grid_index = index;
-    }
+    size_t index;
+    Voxel(const glm::vec3& position, const size_t& index);
 };
 
 class Brick {
@@ -23,8 +19,6 @@ public:
     const size_t& id() const;
 
     virtual const std::string name() const = 0;
-
-    const std::vector<std::vector<glm::vec3>>& orientations();
 protected:
     std::vector<std::shared_ptr<Voxel>> m_location;
     size_t m_id;
@@ -36,8 +30,8 @@ public:
     const std::string name() const;
 
     static const std::vector<std::vector<glm::vec3>> orientations();
-    static const std::vector<std::vector<glm::vec3>> aboveConnectionsByOrientations();
-    static const std::vector<std::vector<glm::vec3>> belowConnectionsByOrientations();
+    static const std::vector<std::vector<glm::vec3>> aboveConnections();
+    static const std::vector<std::vector<glm::vec3>> belowConnections();
 };
 
 class OneTwoPlate : public Brick {
@@ -46,8 +40,8 @@ public:
     const std::string name() const;
 
     static const std::vector<std::vector<glm::vec3>> orientations();
-    static const std::vector<std::vector<glm::vec3>> aboveConnectionsByOrientations();
-    static const std::vector<std::vector<glm::vec3>> belowConnectionsByOrientations();
+    static const std::vector<std::vector<glm::vec3>> aboveConnections();
+    static const std::vector<std::vector<glm::vec3>> belowConnections();
 };
 
 class OneFourPlate : public Brick {
@@ -56,8 +50,8 @@ public:
     const std::string name() const;
 
     static const std::vector<std::vector<glm::vec3>> orientations();
-    static const std::vector<std::vector<glm::vec3>> aboveConnectionsByOrientations();
-    static const std::vector<std::vector<glm::vec3>> belowConnectionsByOrientations();
+    static const std::vector<std::vector<glm::vec3>> aboveConnections();
+    static const std::vector<std::vector<glm::vec3>> belowConnections();
 };
 
 }

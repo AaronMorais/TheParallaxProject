@@ -2,6 +2,11 @@
 
 namespace plx {
 
+Voxel::Voxel(const glm::vec3& position, const size_t& index) {
+    this->position = position;
+    this->index = index;
+}
+
 const std::vector<std::shared_ptr<Voxel>>&
 Brick::location() const
 {

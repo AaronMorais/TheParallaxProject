@@ -41,7 +41,7 @@ private:
         const glm::vec3& voxel,
         const std::vector<glm::vec3>& orientation
         );
-    std::vector<std::shared_ptr<Voxel>> getVoxelsFromOrientation(
+    std::vector<std::shared_ptr<Voxel>> voxelsFromOrientation(
         const std::vector<glm::vec3>& real_orientation
         );
     bool orientationFits(
