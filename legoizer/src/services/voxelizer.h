@@ -37,7 +37,7 @@ public:
 
         void voxelize(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
         void fillShell();
-        void save();
+        void storeData();
 
         glm::vec3 m_min;
         glm::vec3 m_max;

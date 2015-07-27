@@ -29,25 +29,18 @@ void Legoizer::printObj(
     m_data->printObj(os);
 }
 
-void Legoizer::printProcessed(
+void Legoizer::printAlloyAsVoxels(
     std::ostream& os
     )
 {
-    m_preprocessor->print(os);
+    m_data->printAlloyAsVoxels(os);
 }
 
-void Legoizer::printAlloy(
+void Legoizer::printAlloyAsBricks(
     std::ostream& os
     )
 {
-    m_data->printAlloy(os);
-}
-
-void Legoizer::printAlloyBricks(
-    std::ostream& os
-    )
-{
-    m_data->printAlloyBricks(os);
+    m_data->printAlloyAsBricks(os);
 }
 
 std::shared_ptr<plx::LegoData>

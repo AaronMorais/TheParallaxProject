@@ -66,7 +66,7 @@ LegoData::printObj(
 }
 
 void
-LegoData::printAlloy(
+LegoData::printAlloyAsVoxels(
     std::ostream& os
     )
 {
@@ -75,7 +75,7 @@ LegoData::printAlloy(
 }
 
 void
-LegoData::printAlloyBricks(
+LegoData::printAlloyAsBricks(
     std::ostream& os
     )
 {

@@ -19,8 +19,8 @@ public:
     std::vector<std::vector<size_t>>& brick_connections();
 
     void printObj(std::ostream& os);
-    void printAlloy(std::ostream& os);
-    void printAlloyBricks(std::ostream& os);
+    void printAlloyAsVoxels(std::ostream& os);
+    void printAlloyAsBricks(std::ostream& os);
 
 private:
     std::vector<glm::vec3> m_faces;

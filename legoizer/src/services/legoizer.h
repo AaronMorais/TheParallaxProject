@@ -14,9 +14,8 @@ public:
     void voxelize();
     void preprocess();
 
-    void printProcessed(std::ostream& os);
-    void printAlloy(std::ostream& os);
-    void printAlloyBricks(std::ostream& os);
+    void printAlloyAsVoxels(std::ostream& os);
+    void printAlloyAsBricks(std::ostream& os);
     void printObj(std::ostream& os);
 
     std::shared_ptr<plx::LegoData> data();

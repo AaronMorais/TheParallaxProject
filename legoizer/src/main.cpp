@@ -59,7 +59,7 @@ main(
             should_preprocess = true;
         } else if (strcmp(argv[i], "-alloy") == 0) {
             should_print_alloy = true;
-        } else if (strcmp(argv[i], "-alloy_obj") == 0) {
+        } else if (strcmp(argv[i], "-obj") == 0) {
             should_print_obj = true;
         } else if (strcmp(argv[i], "-fill") == 0) {
             plx::Legoizer::shouldFillShell = true;
@@ -91,14 +91,12 @@ main(
         }
     }
 
-    if (should_voxelize && should_preprocess) {
-        if (should_print_alloy) {
-            legoizer->printAlloyBricks(*os);
+    if (should_print_alloy && should_voxelize) {
+        if (should_preprocess) {
+            legoizer->printAlloyAsBricks(*os);
         } else {
-            legoizer->printProcessed(*os);
+            legoizer->printAlloyAsVoxels(*os);
         }
-    } else if (should_print_alloy) {
-        legoizer->printAlloy(*os);
     } else if (should_print_obj) {
         legoizer->printObj(*os);
     }

@@ -13,7 +13,6 @@ public:
     Preprocessor(std::shared_ptr<plx::LegoData> data);
 
     void process();
-    void print(std::ostream& o);
 
     std::shared_ptr<plx::LegoData> data();
 
@@ -30,8 +29,8 @@ private:
     std::map<size_t, std::shared_ptr<Voxel>> m_voxels;
     std::map<size_t, std::vector<std::shared_ptr<Brick>>> m_overlappingBricks;
 
-    void processVoxels(const std::vector<glm::vec3>& voxels );
-    void processBricks(const std::vector<glm::vec3>& voxels );
+    void processVoxels(const std::vector<glm::vec3>& voxels);
+    void processBricks(const std::vector<glm::vec3>& voxels);
 
     void storeData();
 

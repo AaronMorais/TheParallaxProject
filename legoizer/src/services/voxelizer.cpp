@@ -70,7 +70,7 @@ Voxelizer::ShapeVoxelizer::voxelize()
 
     std::cerr << "Adding to grid" << std::endl;
 
-    save();
+    storeData();
 
     std::cerr << "Finished voxelization" << std::endl;
 }
@@ -226,7 +226,7 @@ Voxelizer::ShapeVoxelizer::fillShell()
 }
 
 void
-Voxelizer::ShapeVoxelizer::save()
+Voxelizer::ShapeVoxelizer::storeData()
 {
     std::vector<glm::vec3>& vertices = m_data->vertices();
     std::vector<glm::vec3>& faces = m_data->faces();
