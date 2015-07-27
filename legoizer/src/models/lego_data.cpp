@@ -31,6 +31,24 @@ LegoData::data()
     return m_data;
 }
 
+std::vector<std::vector<unsigned int>>&
+LegoData::brick_locations()
+{
+    return m_brick_locations;
+}
+
+std::vector<std::vector<unsigned int>>&
+LegoData::brick_conflicts()
+{
+    return m_brick_conflicts;
+}
+
+std::vector<std::vector<unsigned int>>&
+LegoData::brick_connections()
+{
+    return m_brick_connections;
+}
+
 void
 LegoData::printObj(
     std::ostream& os
@@ -49,6 +67,44 @@ LegoData::printObj(
 
 void
 LegoData::printAlloy(
+    std::ostream& os
+    )
+{
+    printAlloyVoxels(os);
+    printAlloyColours(os);
+}
+
+void
+LegoData::printAlloyBricks(
+    std::ostream& os
+    )
+{
+    printAlloyVoxels(os);
+    printAlloyLocations(os);
+    printAlloyConflicts(os);
+    printAlloyConnections(os);
+}
+
+void
+LegoData::printAlloyColours(
+    std::ostream& os
+    )
+{
+    std::vector<glm::vec3>& voxels = this->voxels();
+
+    os << "fun colour[] : Voxel -> Colour {" << std::endl;
+
+    for (size_t i = 0; i < voxels.size(); i++) {
+        if (i != 0) {
+            os << "+";
+        }
+        os << "Voxel" << i << "->" << "Red";
+    }
+
+    os << "}" << std::endl;
+}
+void
+LegoData::printAlloyVoxels(
     std::ostream& os
     )
 {
@@ -105,14 +161,104 @@ LegoData::printAlloy(
     }
 
     os << "}" << std::endl;
+}
 
-    os << "fun colour[] : Voxel -> Colour {" << std::endl;
+void
+LegoData::printAlloyLocations(
+    std::ostream& os
+    )
+{
+    std::vector<std::vector<size_t>>& locations = this->brick_locations();
 
-    for (size_t i = 0; i < voxels.size(); i++) {
+    os << "--" << "number of locations: " << locations.size() << std::endl;
+
+    os << "abstract sig BrickLocation {}" << std::endl;
+
+    os << "one sig" << " ";
+
+    for (size_t i = 0; i < locations.size(); i++) {
         if (i != 0) {
-            os << "+";
+            os << ", ";
         }
-        os << "Voxel" << i << "->" << "Red";
+        os << "BrickLocation" << i;
+    }
+
+    os << " " << "extends BrickLocation {}" << std::endl;
+
+
+    os << "fun voxels[] : BrickLocation -> Voxel {" << std::endl;
+
+    for (size_t i = 0; i < locations.size(); i++) {
+        if (i != 0) {
+            os << "+" << std::endl;
+        }
+        os << "BrickLocation" << i << "->(";
+        for (size_t j = 0; j < locations[i].size(); j++) {
+            if (j != 0) {
+                os << "+";
+            }
+            os << "Voxel" << (int)(locations[i][j]);
+        }
+        os << ")";
+    }
+
+    os << "}" << std::endl;
+}
+
+void
+LegoData::printAlloyConflicts(
+    std::ostream& os
+    )
+{
+    std::vector<std::vector<size_t>>& conflicts = this->brick_conflicts();
+
+    os << "fun conflict[] : BrickLocation -> set BrickLocation {" << std::endl;
+
+    for (size_t i = 0; i < conflicts.size(); i++) {
+        if (conflicts[i].empty()) {
+            continue;
+        }
+        if (i != 0) {
+            os << "+" << std::endl;
+        }
+        os << "BrickLocation" << i << "->(";
+        for (size_t j = 0; j < conflicts[i].size(); j++) {
+            if (j != 0) {
+                os << "+";
+            }
+            os << "BrickLocation" << (int)(conflicts[i][j]);
+        }
+        os << ")";
+    }
+
+    os << "}" << std::endl;
+}
+
+
+void
+LegoData::printAlloyConnections(
+    std::ostream& os
+    )
+{
+    std::vector<std::vector<size_t>>& connections = this->brick_connections();
+
+    os << "fun connectedLocation[] : BrickLocation -> set BrickLocation {" << std::endl;
+
+    for (size_t i = 0; i < connections.size(); i++) {
+        if (connections[i].empty()) {
+            continue;
+        }
+        if (i != 0) {
+            os << "+" << std::endl;
+        }
+        os << "BrickLocation" << i << "->(";
+        for (size_t j = 0; j < connections[i].size(); j++) {
+            if (j != 0) {
+                os << "+";
+            }
+            os << "BrickLocation" << (int)(connections[i][j]);
+        }
+        os << ")";
     }
 
     os << "}" << std::endl;

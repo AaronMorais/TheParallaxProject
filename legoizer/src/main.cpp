@@ -92,7 +92,11 @@ main(
     }
 
     if (should_voxelize && should_preprocess) {
-        legoizer->printProcessed(*os);
+        if (should_print_alloy) {
+            legoizer->printAlloyBricks(*os);
+        } else {
+            legoizer->printProcessed(*os);
+        }
     } else if (should_print_alloy) {
         legoizer->printAlloy(*os);
     } else if (should_print_obj) {

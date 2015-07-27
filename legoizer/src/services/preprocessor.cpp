@@ -115,6 +115,8 @@ Preprocessor::processBricks(
 
     }
 
+    storeData();
+
 }
 
 std::vector<glm::vec3>
@@ -171,6 +173,66 @@ Preprocessor::index(
     )
 {
     return m_grid[(size_t)voxel.x][(size_t)voxel.y][(size_t)voxel.z];
+}
+
+void
+Preprocessor::storeData()
+{
+
+    std::vector<std::vector<size_t>>& brick_locations = m_data->brick_locations();
+    for (size_t i = 0; i < m_bricks.size(); i++) {
+        std::shared_ptr<Brick> brick = m_bricks[i];
+        std::vector<size_t> associated_voxels;
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            associated_voxels.push_back(voxel->index - 1);
+        }
+        brick_locations.push_back(associated_voxels);
+    }
+
+    std::vector<std::vector<size_t>>& brick_conflicts = m_data->brick_conflicts();
+    for (std::shared_ptr<Brick> brick : m_bricks) {
+        std::vector<size_t> conflicting_bricks;
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            for (std::shared_ptr<Brick> conflicted_brick : m_overlappingBricks[voxel->index]) {
+                if (brick->id() != conflicted_brick->id()) {
+                    conflicting_bricks.push_back(conflicted_brick->id() - 1);
+                }
+            }
+        }
+        brick_conflicts.push_back(conflicting_bricks);
+    }
+
+    std::vector<std::vector<size_t>>& brick_connections = m_data->brick_connections();
+    for (size_t i = 0; i < m_bricks.size(); ++i) {
+        std::shared_ptr<Brick> current_brick = m_bricks[i];
+        std::vector<size_t> associated_bricks;
+        for (std::shared_ptr<Voxel> voxel : current_brick->location()) {
+            // all bricks above this voxel can be connected to the current brick
+            if ((size_t)voxel->position.y + 1 < m_dimensions.y) {
+                size_t voxel_above = m_grid[(size_t)voxel->position.x][(size_t)voxel->position.y + 1][(size_t)voxel->position.z];
+                if (voxel_above != 0) {
+                    for (std::shared_ptr<Brick> above_brick : m_overlappingBricks[voxel_above]) {
+                        if (current_brick->id() != above_brick->id()) {
+                            associated_bricks.push_back(above_brick->id() - 1);
+                        }
+                    }
+                }
+            }
+            // all bricks below this voxel can be connected to the current brick
+            if ((size_t)voxel->position.y > 0) {
+                size_t voxel_below = m_grid[(size_t)voxel->position.x][(size_t)voxel->position.y - 1][(size_t)voxel->position.z];
+                if (voxel_below != 0) {
+                    for (std::shared_ptr<Brick> below_brick : m_overlappingBricks[voxel_below]) {
+                        if (current_brick->id() != below_brick->id()) {
+                            associated_bricks.push_back(below_brick->id() - 1);
+                        }
+                    }
+                }
+            }
+        }
+        brick_connections.push_back(associated_bricks);
+    }
+
 }
 
 void
@@ -256,10 +318,10 @@ Preprocessor::print(std::ostream& os)
 
                 if (voxel_below != 0) {
 
-                    for (std::shared_ptr<Brick> above_brick : m_overlappingBricks[voxel_below]) {
+                    for (std::shared_ptr<Brick> below_brick : m_overlappingBricks[voxel_below]) {
 
-                        if (current_brick->id() != above_brick->id()) {
-                            std::cerr << " + b" << above_brick->id();
+                        if (current_brick->id() != below_brick->id()) {
+                            std::cerr << " + b" << below_brick->id();
                         }
 
                     }

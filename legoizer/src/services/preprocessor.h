@@ -33,6 +33,8 @@ private:
     void processVoxels(const std::vector<glm::vec3>& voxels );
     void processBricks(const std::vector<glm::vec3>& voxels );
 
+    void storeData();
+
     std::vector<glm::vec3> translateOrientation(
         const glm::vec3& voxel,
         const std::vector<glm::vec3>& orientation

@@ -14,24 +14,6 @@ pred connected[b1, b2 : one Brick] {
     or b1.location in b2.location.connectedLocation
 }
 
--- the definition of what it means for two bricks to be connected
--- functions and predicates are in different name spaces,
--- so it is ok to have a pred and a fun with the same name
---pred connected[b1, b2 : one Brick] {
---  some v1 : b1.voxels |
---      some v2 : b2.voxels | aboveOrBelow[v1, v2]
---}
---
---pred above[v1, v2 : one Voxel] {
---  v1.x = v2.x
---  v1.z = v2.z
---  v1.y = next[v2.y]
---}
---pred aboveOrBelow[v1, v2 : one Voxel] {
---  above[v1,v2] or above[v2,v1]
---}
-
-
 fact WellPlaced {
   -- all Voxels are assigned to some brick
   Brick.location.voxels = Voxel

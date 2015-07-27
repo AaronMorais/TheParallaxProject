@@ -43,6 +43,13 @@ void Legoizer::printAlloy(
     m_data->printAlloy(os);
 }
 
+void Legoizer::printAlloyBricks(
+    std::ostream& os
+    )
+{
+    m_data->printAlloyBricks(os);
+}
+
 std::shared_ptr<plx::LegoData>
 Legoizer::data()
 {
