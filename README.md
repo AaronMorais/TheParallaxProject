@@ -1,7 +1,7 @@
 # TheParallaxProject
 
 # Alloy
-Generates solutions based on our "lego.als" file and a provided alloy voxel model. Example models are available in the "models" folder.
+Generates either voxel-based or brick-based solutions based on one of the "lego.als" files and a provided alloy model. Example models are available in the "models" folder under either "voxels" or "bricks".
 
 Results are outputted to "lego.xml" and "lego.json". To view the result, start a simple web server in the alloy directory and open the "index.html" file.
 
