@@ -1,4 +1,3 @@
-
 --2x2x2
 abstract sig Voxel {}
 one sig A, B, C, D, E, F, G, H extends Voxel {}

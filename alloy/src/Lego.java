@@ -157,8 +157,61 @@ public class Lego {
   }
 
   private static void output_brick_solution_json(Module world, A4Solution sol) throws Exception {
+    Map voxels = new LinkedHashMap();
+    Expr xVoxel = CompUtil.parseOneExpression_fromString(world, "Voxel<:x");
+    Iterator<A4Tuple> itr = ((A4TupleSet)sol.eval(xVoxel)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      voxels.put(element.atom(0), new LinkedHashMap());
+    }
+    itr = ((A4TupleSet)sol.eval(xVoxel)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      ((LinkedHashMap)voxels.get(element.atom(0))).put("x", element.atom(1));
+    }
+
+    Expr yVoxel = CompUtil.parseOneExpression_fromString(world, "Voxel<:y");
+    itr = ((A4TupleSet)sol.eval(yVoxel)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      ((LinkedHashMap)voxels.get(element.atom(0))).put("y", element.atom(1));
+    }
+
+    Expr zVoxel = CompUtil.parseOneExpression_fromString(world, "Voxel<:z");
+    itr = ((A4TupleSet)sol.eval(zVoxel)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      ((LinkedHashMap)voxels.get(element.atom(0))).put("z", element.atom(1));
+    }
+
+    Map brickList = new LinkedHashMap();
+    Map brickColourList = new LinkedHashMap();
+    Expr brickExpr = CompUtil.parseOneExpression_fromString(world, "Brick.location");
+    itr = ((A4TupleSet)sol.eval(brickExpr)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      brickList.put(element.atom(0), new LinkedList());
+      brickColourList.put(element.atom(0), "Red$0");
+    }
+
+    Expr voxelToBrickExpr = CompUtil.parseOneExpression_fromString(world, "Brick.location<:voxels");
+    itr = ((A4TupleSet)sol.eval(voxelToBrickExpr)).iterator();
+    while (itr.hasNext()) {
+      A4Tuple element = (A4Tuple)itr.next();
+      ((LinkedList)brickList.get(element.atom(0))).add(element.atom(1));
+    }
+
+    Map list = new LinkedHashMap();
+    list.put("bricks", brickList);
+    list.put("voxels", voxels);
+    list.put("colours", brickColourList);
+
+    StringWriter listOut = new StringWriter();
+    JSONValue.writeJSONString(list, listOut);
+    String listJSON = listOut.toString();
+
     PrintWriter out = new PrintWriter(outputJsonFileName);
-    out.println("");
+    out.println(listJSON);
     out.close();
   }
 
