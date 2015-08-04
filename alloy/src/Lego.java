@@ -45,8 +45,11 @@ public class Lego {
     if (modelNameSplit.length < 2) {
       System.err.println("Model name does not have an extension");
     }
-    if (modelNameSplit[1].equals("bricks")) {
+    if (modelNameSplit[1].contains("bricks")) {
+      System.out.println("Running in bricks mode");
       legoModeIsVoxel = false;
+    } else {
+      System.out.println("Running in voxels mode");
     }
 
     String lego_model = readFile(modelName);
@@ -90,6 +93,7 @@ public class Lego {
       sol = nextSolution;
       solution_count += 1;
     }
+    System.out.println("Exiting");
   }
 
   private static void output_voxel_solution_json(Module world, A4Solution sol) throws Exception {

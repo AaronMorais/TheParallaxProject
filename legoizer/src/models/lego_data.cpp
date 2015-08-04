@@ -135,7 +135,7 @@ LegoData::printAlloyVoxels(
         if (i != 0) {
             os << "+";
         }
-        os << "Voxel" << i << "->" << (size_t)(voxels[i].x);
+        os << "Voxel" << i << "->" << (size_t)(voxels[i].x) << " ";
     }
 
     os << "}" << std::endl;
@@ -146,7 +146,7 @@ LegoData::printAlloyVoxels(
         if (i != 0) {
             os << "+";
         }
-        os << "Voxel" << i << "->" << (size_t)(voxels[i].y);
+        os << "Voxel" << i << "->" << (size_t)(voxels[i].y) << " ";
     }
 
     os << "}" << std::endl;
@@ -157,7 +157,7 @@ LegoData::printAlloyVoxels(
         if (i != 0) {
             os << "+";
         }
-        os << "Voxel" << i << "->" << (size_t)(voxels[i].z);
+        os << "Voxel" << i << "->" << (size_t)(voxels[i].z) << " ";
     }
 
     os << "}" << std::endl;
@@ -244,11 +244,13 @@ LegoData::printAlloyConnections(
 
     os << "fun connectedLocation[] : BrickLocation -> set BrickLocation {" << std::endl;
 
+    int skip = 0;
     for (size_t i = 0; i < connections.size(); i++) {
         if (connections[i].empty()) {
+            skip++;
             continue;
         }
-        if (i != 0) {
+        if (i != skip) {
             os << "+" << std::endl;
         }
         os << "BrickLocation" << i << "->(";

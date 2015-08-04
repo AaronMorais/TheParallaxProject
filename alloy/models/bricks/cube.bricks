@@ -8,10 +8,6 @@ fun y[] : Voxel -> Int {
 fun z[] : Voxel -> Int {
   A -> 0 + B->0 + C-> 1 + D->1 + E->0 + F->0 + G->1 + H->1}
 
-abstract sig Brick {
-  location : one BrickLocation
-}
-
 abstract sig BrickLocation {}
 one sig OneOnePlateL0, OneOnePlateL1, OneOnePlateL2, OneOnePlateL3, OneOnePlateL4,
   OneOnePlateL5, OneOnePlateL6, OneOnePlateL7, OneTwoPlateL0, OneTwoPlateL1,

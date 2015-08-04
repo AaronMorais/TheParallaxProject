@@ -115,7 +115,7 @@ Preprocessor::processBricks(
 
     }
 
-    storeData();
+    storeDataLayered();
 
 }
 
@@ -179,8 +179,7 @@ void
 Preprocessor::storeData()
 {
     std::vector<std::vector<size_t>>& brick_locations = m_data->brick_locations();
-    for (size_t i = 0; i < m_bricks.size(); i++) {
-        std::shared_ptr<Brick> brick = m_bricks[i];
+    for (std::shared_ptr<Brick> brick : m_bricks) {
         std::vector<size_t> associated_voxels;
         for (std::shared_ptr<Voxel> voxel : brick->location()) {
             associated_voxels.push_back(voxel->index - 1);
@@ -202,8 +201,7 @@ Preprocessor::storeData()
     }
 
     std::vector<std::vector<size_t>>& brick_connections = m_data->brick_connections();
-    for (size_t i = 0; i < m_bricks.size(); ++i) {
-        std::shared_ptr<Brick> current_brick = m_bricks[i];
+    for (std::shared_ptr<Brick> current_brick : m_bricks) {
         std::vector<size_t> associated_bricks;
         for (std::shared_ptr<Voxel> voxel : current_brick->location()) {
             // all bricks above this voxel can be connected to the current brick
@@ -231,7 +229,126 @@ Preprocessor::storeData()
         }
         brick_connections.push_back(associated_bricks);
     }
+}
 
+void
+Preprocessor::storeDataLayered()
+{
+    int minimum_layer = INT_MAX;
+    for (std::shared_ptr<Brick> brick : m_bricks) {
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            if (voxel->position.y < minimum_layer) {
+                minimum_layer = voxel->position.y;
+            }
+        }
+    }
+
+    int layer_height = 1;
+
+    std::cerr << "Lowest layer: " << minimum_layer << std::endl;
+    std::cerr << "Highest layer: " << minimum_layer + layer_height << std::endl;
+
+    std::vector<std::vector<size_t>>& brick_locations = m_data->brick_locations();
+    for (std::shared_ptr<Brick> brick : m_bricks) {
+        std::vector<size_t> associated_voxels;
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            associated_voxels.push_back(voxel->index - 1);
+        }
+        brick_locations.push_back(associated_voxels);
+    }
+
+    std::vector<std::vector<size_t>>& brick_conflicts = m_data->brick_conflicts();
+    for (std::shared_ptr<Brick> brick : m_bricks) {
+
+        bool all_in_layer = true;
+        for (std::shared_ptr<Voxel> voxel : brick->location()) {
+            if (voxel->position.y > minimum_layer + layer_height) {
+                all_in_layer = false;
+            }
+        }
+
+        if (all_in_layer == true) {
+
+            std::vector<size_t> conflicting_bricks;
+            for (std::shared_ptr<Voxel> voxel : brick->location()) {
+                for (std::shared_ptr<Brick> conflicted_brick : m_overlappingBricks[voxel->index]) {
+                    if (brick->id() != conflicted_brick->id()) {
+                        conflicting_bricks.push_back(conflicted_brick->id() - 1);
+                    }
+                }
+            }
+            brick_conflicts.push_back(conflicting_bricks);
+
+        }
+    }
+
+    std::vector<std::vector<size_t>>& brick_connections = m_data->brick_connections();
+    for (std::shared_ptr<Brick> current_brick : m_bricks) {
+
+        bool all_in_layer = true;
+        for (std::shared_ptr<Voxel> voxel : current_brick->location()) {
+            if (voxel->position.y > minimum_layer + layer_height) {
+                all_in_layer = false;
+            }
+        }
+
+        if (all_in_layer == true) {
+
+            std::vector<size_t> associated_bricks;
+            for (std::shared_ptr<Voxel> voxel : current_brick->location()) {
+                // all bricks above this voxel can be connected to the current brick
+                if ((size_t)voxel->position.y + 1 < m_dimensions.y) {
+                    size_t voxel_above = m_grid[(size_t)voxel->position.x][(size_t)voxel->position.y + 1][(size_t)voxel->position.z];
+                    if (voxel_above != 0) {
+                        for (std::shared_ptr<Brick> above_brick : m_overlappingBricks[voxel_above]) {
+
+                            bool all_in_layer = true;
+                            for (std::shared_ptr<Voxel> voxel : above_brick->location()) {
+                                if (voxel->position.y > minimum_layer + layer_height) {
+                                    all_in_layer = false;
+                                }
+                            }
+
+                            if (all_in_layer == true) {
+
+                                if (current_brick->id() != above_brick->id()) {
+                                    associated_bricks.push_back(above_brick->id() - 1);
+                                }
+
+                            }
+                        }
+                    }
+                }
+                // all bricks below this voxel can be connected to the current brick
+                if ((size_t)voxel->position.y > 0) {
+                    size_t voxel_below = m_grid[(size_t)voxel->position.x][(size_t)voxel->position.y - 1][(size_t)voxel->position.z];
+                    if (voxel_below != 0) {
+                        for (std::shared_ptr<Brick> below_brick : m_overlappingBricks[voxel_below]) {
+
+
+                            bool all_in_layer = true;
+                            for (std::shared_ptr<Voxel> voxel : below_brick->location()) {
+                                if (voxel->position.y > minimum_layer + layer_height) {
+                                    all_in_layer = false;
+                                }
+                            }
+
+                            if (all_in_layer == true) {
+
+                                if (current_brick->id() != below_brick->id()) {
+                                    associated_bricks.push_back(below_brick->id() - 1);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            brick_connections.push_back(associated_bricks);
+
+        }
+    }
 }
 
 std::shared_ptr<plx::LegoData>

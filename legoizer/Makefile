@@ -64,11 +64,11 @@ clean:
 	@echo "    Cleaning...";
 	@echo "    $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)"; $(RM) -r $(BUILD_DIR) $(PROJECT_TARGET) $(TEST_TARGET)
 
-run-teapot: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) -File $(ASSETS_DIR)/teapot.obj -Output $(BUILD_DIR)/teapot.model -voxelize -preprocess -fill -subdivisions 3
+run-teapot-voxels: $(PROJECT_TARGET)
+	$(PROJECT_TARGET) -File $(ASSETS_DIR)/teapot.obj -Output $(BUILD_DIR)/teapot.voxels -voxelize -preprocess -fill -subdivisions 3
 
-run-teapot-alloy: $(PROJECT_TARGET)
-	$(PROJECT_TARGET) -File $(ASSETS_DIR)/teapot.obj -Output $(BUILD_DIR)/teapot.model -voxelize -preprocess -alloy -fill -subdivisions 5
+run-teapot-bricks: $(PROJECT_TARGET)
+	$(PROJECT_TARGET) -File $(ASSETS_DIR)/teapot.obj -Output $(BUILD_DIR)/teapot.bricks -voxelize -preprocess -alloy -fill -subdivisions 5
 
 run-tests: $(TEST_TARGET)
 	$(TEST_TARGET) -File $(ASSETS_DIR)/teapot.obj -voxelize -fill -subdivisions 2
