@@ -31,19 +31,19 @@ LegoData::data()
     return m_data;
 }
 
-std::vector<std::vector<unsigned int>>&
+std::vector<std::vector<size_t>>&
 LegoData::brick_locations()
 {
     return m_brick_locations;
 }
 
-std::vector<std::vector<unsigned int>>&
+std::vector<std::vector<size_t>>&
 LegoData::brick_conflicts()
 {
     return m_brick_conflicts;
 }
 
-std::vector<std::vector<unsigned int>>&
+std::vector<std::vector<size_t>>&
 LegoData::brick_connections()
 {
     return m_brick_connections;
@@ -113,7 +113,7 @@ LegoData::printAlloyVoxels(
     os << "--" << "number of voxels: " << voxels.size() << std::endl;
 
     for (size_t i = 0; i < voxels.size(); i++) {
-        os << "-- Voxel" << i << " -> " << (int)(voxels[i].x) << "," << (int)(voxels[i].y) << "," << (int)(voxels[i].z) << std::endl;
+        os << "-- Voxel" << i << " -> " << (size_t)(voxels[i].x) << "," << (size_t)(voxels[i].y) << "," << (size_t)(voxels[i].z) << std::endl;
     }
 
     os << "abstract sig Voxel {}" << std::endl;
@@ -135,7 +135,7 @@ LegoData::printAlloyVoxels(
         if (i != 0) {
             os << "+";
         }
-        os << "Voxel" << i << "->" << (int)(voxels[i].x);
+        os << "Voxel" << i << "->" << (size_t)(voxels[i].x);
     }
 
     os << "}" << std::endl;
@@ -146,7 +146,7 @@ LegoData::printAlloyVoxels(
         if (i != 0) {
             os << "+";
         }
-        os << "Voxel" << i << "->" << (int)(voxels[i].y);
+        os << "Voxel" << i << "->" << (size_t)(voxels[i].y);
     }
 
     os << "}" << std::endl;
@@ -157,7 +157,7 @@ LegoData::printAlloyVoxels(
         if (i != 0) {
             os << "+";
         }
-        os << "Voxel" << i << "->" << (int)(voxels[i].z);
+        os << "Voxel" << i << "->" << (size_t)(voxels[i].z);
     }
 
     os << "}" << std::endl;
@@ -197,7 +197,7 @@ LegoData::printAlloyLocations(
             if (j != 0) {
                 os << "+";
             }
-            os << "Voxel" << (int)(locations[i][j]);
+            os << "Voxel" << (size_t)(locations[i][j]);
         }
         os << ")";
     }
@@ -226,7 +226,7 @@ LegoData::printAlloyConflicts(
             if (j != 0) {
                 os << "+";
             }
-            os << "BrickLocation" << (int)(conflicts[i][j]);
+            os << "BrickLocation" << (size_t)(conflicts[i][j]);
         }
         os << ")";
     }
@@ -256,7 +256,7 @@ LegoData::printAlloyConnections(
             if (j != 0) {
                 os << "+";
             }
-            os << "BrickLocation" << (int)(connections[i][j]);
+            os << "BrickLocation" << (size_t)(connections[i][j]);
         }
         os << ")";
     }

@@ -82,15 +82,15 @@ Preprocessor::processBricks(
     const std::vector<glm::vec3>& voxels
     )
 {
-    std::vector<std::pair<std::vector<std::vector<glm::vec3>>, std::string>> all_orientations;
-    all_orientations.push_back(std::make_pair(OneOnePlate::orientations(), std::string(OneOnePlate::name)));
-    all_orientations.push_back(std::make_pair(OneTwoPlate::orientations(), std::string(OneTwoPlate::name)));
-    all_orientations.push_back(std::make_pair(OneFourPlate::orientations(), std::string(OneFourPlate::name)));
+    std::vector<std::pair<std::vector<std::vector<glm::vec3>>, std::shared_ptr<plx::Brick::IFactory>>> all_orientations;
+    all_orientations.push_back(std::make_pair(OneOnePlate::orientations(), std::make_shared<plx::OneOnePlate::Factory>()));
+    all_orientations.push_back(std::make_pair(OneTwoPlate::orientations(), std::make_shared<plx::OneOnePlate::Factory>()));
+    all_orientations.push_back(std::make_pair(OneFourPlate::orientations(), std::make_shared<plx::OneOnePlate::Factory>()));
 
     size_t idx = 1;
     for (const glm::vec3& voxel : voxels) {
 
-        for (const std::pair<std::vector<std::vector<glm::vec3>>, std::string>& brick_type : all_orientations) {
+        for (const std::pair<std::vector<std::vector<glm::vec3>>, std::shared_ptr<plx::Brick::IFactory>>& brick_type : all_orientations) {
 
             for (const std::vector<glm::vec3>& unit_orientation : brick_type.first) {
 
@@ -98,7 +98,7 @@ Preprocessor::processBricks(
 
                 if (orientationFits(translated_orientation)) {
 
-                    std::shared_ptr<Brick> brick = Brick::Factory::create(brick_type.second.c_str(), std::move(voxelsFromOrientation(translated_orientation)), idx);
+                    std::shared_ptr<Brick> brick = brick_type.second->create(std::move(voxelsFromOrientation(translated_orientation)), idx);
 
                     m_bricks.push_back(brick);
 
